@@ -122,16 +122,31 @@
     <div class="group">
       <div class="gname">五行生态 · 生克休囚死</div>
       <div class="row"><div class="rt"><label for="perType">每族个体数</label><span class="val" id="v-perType"></span></div><input type="range" id="perType"></div>
-      <div class="row"><div class="rt"><label for="produceRate">产出率 <span class="en">生·物质</span></label><span class="val" id="v-produceRate"></span></div><input type="range" id="produceRate"></div>
+      <div class="row"><div class="rt"><label for="pYang">阳料占比 <span class="en">排出物·阴阳比</span></label><span class="val" id="v-pYang"></span></div><input type="range" id="pYang"></div>
+      <div class="gname" style="margin-top:10px">投喂口 · 病从口入 <span class="en">外部输入·每步</span></div>
+      <div class="row"><div class="rt"><label for="feedYang0">木口 阳料</label><span class="val" id="v-feedYang0"></span></div><input type="range" id="feedYang0"></div>
+      <div class="row"><div class="rt"><label for="feedYang1">火口 阳料</label><span class="val" id="v-feedYang1"></span></div><input type="range" id="feedYang1"></div>
+      <div class="row"><div class="rt"><label for="feedYang2">土口 阳料</label><span class="val" id="v-feedYang2"></span></div><input type="range" id="feedYang2"></div>
+      <div class="row"><div class="rt"><label for="feedYang3">金口 阳料</label><span class="val" id="v-feedYang3"></span></div><input type="range" id="feedYang3"></div>
+      <div class="row"><div class="rt"><label for="feedYang4">水口 阳料</label><span class="val" id="v-feedYang4"></span></div><input type="range" id="feedYang4"></div>
+      <div class="row"><div class="rt"><label for="feedYin0">木口 阴料</label><span class="val" id="v-feedYin0"></span></div><input type="range" id="feedYin0"></div>
+      <div class="row"><div class="rt"><label for="feedYin1">火口 阴料</label><span class="val" id="v-feedYin1"></span></div><input type="range" id="feedYin1"></div>
+      <div class="row"><div class="rt"><label for="feedYin2">土口 阴料</label><span class="val" id="v-feedYin2"></span></div><input type="range" id="feedYin2"></div>
+      <div class="row"><div class="rt"><label for="feedYin3">金口 阴料</label><span class="val" id="v-feedYin3"></span></div><input type="range" id="feedYin3"></div>
+      <div class="row"><div class="rt"><label for="feedYin4">水口 阴料</label><span class="val" id="v-feedYin4"></span></div><input type="range" id="feedYin4"></div>
+      <div class="row"><div class="rt"><label for="feedR">投喂散布半径</label><span class="val" id="v-feedR"></span></div><input type="range" id="feedR"></div>
+      <div class="hint" style="margin-top:6px;opacity:.7">把阳料全拉到 0 = <b>断供</b>：看结构如何耗散至死。</div>
+      <div class="row"><div class="rt"><label for="nutrientE">营养供能 <span class="en">吃阳料·E+</span></label><span class="val" id="v-nutrientE"></span></div><input type="range" id="nutrientE"></div>
+      <div class="row"><div class="rt"><label for="yinCost">废物耗能 <span class="en">碰阴料·E−</span></label><span class="val" id="v-yinCost"></span></div><input type="range" id="yinCost"></div>
       <div class="row"><div class="rt"><label for="metabolism">代谢率 <span class="en">阴·耗能</span></label><span class="val" id="v-metabolism"></span></div><input type="range" id="metabolism"></div>
-      <div class="row"><div class="rt"><label for="preyGain">吞噬收益 <span class="en">克·供能</span></label><span class="val" id="v-preyGain"></span></div><input type="range" id="preyGain"></div>
-      <div class="row"><div class="rt"><label for="splitM">分裂阈值 <span class="en">阳·增殖</span></label><span class="val" id="v-splitM"></span></div><input type="range" id="splitM"></div>
-      <div class="row"><div class="rt"><label for="chaseGain">追捕强度 <span class="en">克</span></label><span class="val" id="v-chaseGain"></span></div><input type="range" id="chaseGain"></div>
-      <div class="row"><div class="rt"><label for="fleeGain">逃避强度</label><span class="val" id="v-fleeGain"></span></div><input type="range" id="fleeGain"></div>
-      <div class="row"><div class="rt"><label for="forageGain">觅食强度 <span class="en">生</span></label><span class="val" id="v-forageGain"></span></div><input type="range" id="forageGain"></div>
+      <div class="row"><div class="rt"><label for="splitE">分裂能量 <span class="en">阳·E 达此值分裂</span></label><span class="val" id="v-splitE"></span></div><input type="range" id="splitE"></div>
+      <div class="row"><div class="rt"><label for="forageGain">觅食力 <span class="en">生·主动找食</span></label><span class="val" id="v-forageGain"></span></div><input type="range" id="forageGain"></div>
+      <div class="row"><div class="rt"><label for="forageR">觅食视野 <span class="en">看多远</span></label><span class="val" id="v-forageR"></span></div><input type="range" id="forageR"></div>
+      <div class="row"><div class="rt"><label for="fleeYinGain">避污力 <span class="en">避害·默认0</span></label><span class="val" id="v-fleeYinGain"></span></div><input type="range" id="fleeYinGain"></div>
       <div class="hint" style="margin-top:7px">
-        <b>木火土金水</b>五族。相生：i 的产出（材料点）被 i+1 吃；相克：i 追捕 i+2，相碰即吞噬。<br>
-        <b>阴</b>=代谢耗能（E 尽则亡，颜色随之变淡）；<b>阳</b>=物质满则分裂。金生水、金克木…看它们能否<b>共存</b>，还是一方独大后<b>崩解</b>。
+        <b>木火土金水</b>五族。发光粒子 = 行料：<b>核心 1px = 族群色</b>（谁产的），<b>辉光 = 阴阳</b>（<b>黄辉</b>=阳料/营养，<b>白辉</b>=阴料/废物）。<br>
+        <b>生</b>：i 排阳料 → i+1 吃（E+）；<b>克</b>：i 排阴料 → i+2 耗能回收（E−）。<b>吃一份才排一份，物质守恒</b>。<br>
+        细胞随机游走，<b>碰到才算，不主动追</b>。<b>能量 E=0 → 死</b>；<b>E 达分裂能量 → 分裂成两个半能量细胞</b>。看它们能否<b>共存</b>，还是一方独大后<b>崩解</b>。
       </div>
     </div>
 
@@ -248,14 +263,34 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     //   相克：i 追捕 i+2，相碰即吞噬
     //   阴阳：E（能量）耗尽 → 死（阴）；M（物质）满 → 分裂（阳）
     perType: 70,         // 每个族群的初始个体数
-    produceRate: 0.012,  // 每 tick 产出材料点的概率（生）
-    metabolism: 0.00020, // 每 tick 能量消耗（阴）—— 越大死得越快
-    dotGain: 0.16,       // 吃一个材料点 → 物质 M +
-    preyGain: 0.90,      // 吞噬一个猎物 → 能量 E +
-    splitM: 0.70,        // M 达到此值 → 分裂（阳）
-    chaseGain: 1.8,      // 追捕猎物强度（克）
-    fleeGain: 0.2,       // 逃避天敌强度
-    forageGain: 1.1,     // 觅食材料强度（生）
+    // —— 行料分阴阳：生与克，是同一种"料流"的两个符号 ——
+    //   阳料（营养，黄框）：i 产 → i+1 吃掉 → 物质 M+ 且供能 E+（增益）
+    //   阴料（废物，白框）：i 代谢产 → i+2 碰到要花能量清理 → E−（减益 = 相克）
+    //   于是"克"不再是"咬死你"，而是"替你（上游）还债"——克链、生链都是闭环。
+    pYang: 0.5,          // 排出物中「阳料」的占比（其余为阴料）—— 严格 1 进 1 出，物质守恒
+    seedMat: 1000,       // 初始撒入的行料总数（守恒系统的物质总量 = 这个数）
+    // —— 投喂口（"病从口入"）：外部持续输入的入口，系统唯一的能量/物质来源 ——
+    //    feedYang[i] = 第 i 号口每步注入的「阳料」（营养）；feedYin[i] = 注入的「阴料」（毒素）。
+    //    全为 0 = 断供（封闭系统）→ 纯耗散 → 必然全死。
+    feedYang: [0.3, 0.3, 0.3, 0.3, 0.3],   // 默认 = 收支相抵的"进补"档（0.1 饿 / 0.3 均衡 / 1.5 过亢）
+    feedYin:  [0, 0, 0, 0, 0],
+    feedR: 320,          // 投喂口半径（料在口周围散布，大 = 离散分布；小 = 挤成一团）
+    metabolism: 0.015,   // 每 tick 能量消耗（阴）—— 越大死得越快
+    E0: 50,              // 初始能量
+    splitE: 100,         // 能量达到此值 → 分裂成两个 E/2 的细胞（阳）
+    nutrientE: 12,       // 吃一个阳料 → 能量 E +（营养 = 燃料）
+    yinCost: 6,          // 碰一个阴料 → 能量 E −（回收废物的代价 = 相克）
+    dotGain: 0.16,       // 遗留字段（M 已废弃，不再使用）
+    // —— 主动力 ——
+    //   觅食（生）：细胞主动趋近"可食的阳料"（否则纯靠碰运气撞料 → 必然饿死）。
+    //   避污（害）：默认关闭 —— 阴料不躲，撞到就撞到（只是扣能量），更像真实代谢。
+    forageGain: 1.2,     // 觅食阳料强度（生）
+    forageR: 90,         // 觅食视野半径 —— 有限视野 → 局部耗竭 → 自稳（太大则失稳）
+    fleeYinGain: 0,      // 避开阴料强度（避害）—— 默认 0（不躲）
+    // —— 捕食模型遗留（已废弃，保留字段防旧引用报错；"克"已改为排污/代谢）——
+    preyGain: 0.0,
+    chaseGain: 0.0,
+    fleeGain: 0.0,
     // —— 活性（气）——
     // 每族的"活性"倍率：乘在速度上下限上。速度是中性参数 —— 同时放大生（觅食）
     // 与克（捕猎）的效率。所以"活性"≈"气"，是旺衰的直接旋钮。
@@ -266,7 +301,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     //   加上"饿→慢→抓不到→更饿"的正反馈 → 系统变脆（五族共存被打破）。
     //   → 微观影响过大，默认关闭。要做的话应让 eRef ≈ 实际典型能量（≈0.35），或只在下尾段轻微生效。
     energyAct: 0,        // 1 = 启用；0 = 关闭（默认）
-    eRef: 0.72,          // 能量基准（E=基准 → 系数 1.0）
+    eRef: 50,            // 能量基准（E=基准 → 系数 1.0）
     eFloor: 0.12,        // 系数下限（防僵死）
     eCap: 1.8,           // 系数上限（防过冲）
     dotCap: 2600,        // 材料点数量上限（性能护栏）
@@ -283,31 +318,76 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     names: ['木', '火', '土', '金', '水'],
     rgb:   [[61, 220, 132], [255, 90, 77], [232, 193, 74], [207, 216, 227], [77, 163, 255]],
     css:   ['#3ddc84', '#ff5a4d', '#e8c14a', '#cfd8e3', '#4da3ff'],
-    gen:  function (i) { return (i + 1) % 5; },   // i 生 gen(i)：i 的产出给 gen(i) 吃
-    prey: function (i) { return (i + 2) % 5; },   // i 克 prey(i)：i 追捕 prey(i)
-    pred: function (i) { return (i + 3) % 5; }    // 克 i 的是 pred(i)（即 i-2）
+    gen:  function (i) { return (i + 1) % 5; },   // i 生 gen(i)：i 的阳料给 gen(i) 吃
+    prey: function (i) { return (i + 2) % 5; },   // i 克 prey(i)：i 的阴料由 prey(i) 去清理
+    pred: function (i) { return (i + 3) % 5; }    // 克 i 的是 pred(i)（即 i-2）：它的阴料砸向我
   };
 
-  // 材料点（"吃豆人里的豆豆"）—— 物质不会流动，会堆积，会被吃
-  var materials = [];   // {x, y, p}  p = 生产者族群（(p+1)%5 可食）
+  // 行料（"豆豆"）—— 物质不会流动，会堆积，会被碰掉
+  //   {x, y, p, yin}  p = 生产者族群
+  //   yin=0 阳料（营养）：由 (p+1)%5 吃 → M+ E+
+  //   yin=1 阴料（废物）：由 (p+2)%5 清理 → E−
+  var materials = [];
+
+  // 投喂口（"病从口入"）—— 5 个空间位置，每步向外注入行料
+  var feeders = [];
+  var feedAccY = [0, 0, 0, 0, 0];   // 阳料投喂累加器（<1 的量攒着）
+  var feedAccN = [0, 0, 0, 0, 0];   // 阴料投喂累加器
+
+  // 行料辉光精灵（预渲染，避免每帧为上千个料点新建渐变）：
+  //   核心 1 像素 = 生产者族群色（"哪一行产的"），辉光 = 阴阳（黄辉=阳料营养 / 白辉=阴料废物）
+  var glowSprites = null;
+  function buildGlowSprites() {
+    glowSprites = [];
+    var R = 6, S = R * 2 + 1;
+    for (var t = 0; t < 5; t++) {
+      glowSprites[t] = [];
+      for (var yn = 0; yn < 2; yn++) {
+        var cv = document.createElement('canvas');
+        cv.width = S; cv.height = S;
+        var g = cv.getContext('2d');
+        var glow = yn ? [255, 255, 255] : [255, 214, 74];   // 阴=白辉；阳=黄辉
+        var base = WX.rgb[t];                               // 核心色 = 族群色
+        // 1) 外辉光：阴阳色（柔化，别盖过核心）
+        var grd = g.createRadialGradient(R, R, 0, R, R, R);
+        grd.addColorStop(0,    'rgba(' + glow[0] + ',' + glow[1] + ',' + glow[2] + ',0.72)');
+        grd.addColorStop(0.30, 'rgba(' + glow[0] + ',' + glow[1] + ',' + glow[2] + ',0.26)');
+        grd.addColorStop(1,    'rgba(' + glow[0] + ',' + glow[1] + ',' + glow[2] + ',0)');
+        g.fillStyle = grd; g.fillRect(0, 0, S, S);
+        // 2) 核心：族群色实心圆 + 深色描边（放大到可见，确保相近色辉光下也能分辨）
+        g.beginPath();
+        g.arc(R + 0.5, R + 0.5, 1.9, 0, 6.2832);
+        g.fillStyle = 'rgb(' + base[0] + ',' + base[1] + ',' + base[2] + ')';
+        g.fill();
+        g.lineWidth = 1; g.strokeStyle = 'rgba(0,0,0,0.62)';
+        g.stroke();
+        glowSprites[t][yn] = cv;
+      }
+    }
+  }
 
   // 生态统计：各族群的数量 / 出生 / 死亡 / 被吞噬 / 产出 —— "休囚死"的仪表盘
   var WXstats = {
     pop: [0, 0, 0, 0, 0],
     born: [0, 0, 0, 0, 0], died: [0, 0, 0, 0, 0],
     eaten: [0, 0, 0, 0, 0], produced: [0, 0, 0, 0, 0],
-    consumed: [0, 0, 0, 0, 0],          // 吃掉上游材料点的累计数（按"消费者"族群）
-    matCount: [0, 0, 0, 0, 0],          // 各族群产出的材料点，现存数量
+    consumed: [0, 0, 0, 0, 0],          // 吃阳料的累计数（按"消费者"族群）
+    yinProduced: [0, 0, 0, 0, 0],       // 产阴料的累计数（按生产者族群）
+    yinConsumed: [0, 0, 0, 0, 0],       // 清理阴料的累计数（按"清理者"族群）
+    matCount: [0, 0, 0, 0, 0],          // 各族群产出的阳料，现存数量
     rateBorn: [0, 0, 0, 0, 0], rateDied: [0, 0, 0, 0, 0],   // 速率（次/秒）
     rateProd: [0, 0, 0, 0, 0], rateCons: [0, 0, 0, 0, 0],
+    rateYin: [0, 0, 0, 0, 0],   // 流入该行的「阴料」速率（被上游废物损耗的速度）
     prev: null, tick: 0, history: []
   };
   function wipeCounts() {
     for (var i = 0; i < 5; i++) {
       WXstats.pop[i] = 0; WXstats.born[i] = 0; WXstats.died[i] = 0;
       WXstats.eaten[i] = 0; WXstats.produced[i] = 0; WXstats.consumed[i] = 0;
+      WXstats.yinProduced[i] = 0; WXstats.yinConsumed[i] = 0;
       WXstats.matCount[i] = 0;
       WXstats.rateBorn[i] = 0; WXstats.rateDied[i] = 0; WXstats.rateProd[i] = 0; WXstats.rateCons[i] = 0;
+      WXstats.rateYin[i] = 0;
     }
     WXstats.prev = null;
     WXstats.history.length = 0;
@@ -340,13 +420,15 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     chemoGain:    { min: 0, max: 5,   step: 0.1,  fmt: function (v) { return v.toFixed(1); } },
     blockAvoid:   { min: 0, max: 3,   step: 0.05, fmt: function (v) { return v.toFixed(2); } },
     perType:     { min: 10, max: 200, step: 5,     fmt: function (v) { return v.toFixed(0); } },
-    produceRate: { min: 0,  max: 0.05, step: 0.001, fmt: function (v) { return v.toFixed(3); } },
-    metabolism:  { min: 0,  max: 0.006, step: 0.0001, fmt: function (v) { return v.toFixed(4); } },
-    preyGain:    { min: 0,  max: 1,   step: 0.05,  fmt: function (v) { return v.toFixed(2); } },
-    splitM:      { min: 0.2, max: 3,  step: 0.1,   fmt: function (v) { return v.toFixed(1); } },
-    chaseGain:   { min: 0,  max: 4,   step: 0.1,   fmt: function (v) { return v.toFixed(1); } },
-    fleeGain:    { min: 0,  max: 4,   step: 0.1,   fmt: function (v) { return v.toFixed(1); } },
-    forageGain:  { min: 0,  max: 4,   step: 0.1,   fmt: function (v) { return v.toFixed(1); } }
+    pYang:       { min: 0,  max: 1,   step: 0.05,  fmt: function (v) { return v.toFixed(2); } },
+    metabolism:  { min: 0,  max: 0.15, step: 0.002, fmt: function (v) { return v.toFixed(3); } },
+    nutrientE:   { min: 0,  max: 30, step: 0.5,  fmt: function (v) { return v.toFixed(1); } },
+    yinCost:     { min: 0,  max: 30, step: 0.5,  fmt: function (v) { return v.toFixed(1); } },
+    splitE:      { min: 20, max: 300, step: 5,   fmt: function (v) { return v.toFixed(0); } },
+    forageGain:  { min: 0,  max: 4,   step: 0.1,   fmt: function (v) { return v.toFixed(1); } },
+    forageR:     { min: 20, max: 400, step: 10,    fmt: function (v) { return v.toFixed(0); } },
+    feedR:       { min: 20, max: 800, step: 10,    fmt: function (v) { return v.toFixed(0); } },
+    fleeYinGain: { min: 0,  max: 4,   step: 0.1,   fmt: function (v) { return v.toFixed(1); } }
   };
 
   var COS_LIMIT = -1;          // 由 fov 推得的 cos 阈值（-1 表示无角度限制）
@@ -396,8 +478,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     this.seed = seed || 0;
     // —— 五行生态字段 ——
     this.type = (type | 0) || 0;   // 族群 0~4
-    this.E = 0.72;                 // 能量（阳的燃料）：代谢耗尽 → 死（阴）
-    this.M = 0.25;                 // 物质（生长的原料）：满 → 分裂（阳）
+    this.E = P.E0;                 // 能量：0 → 死；≥splitE → 分裂（对半分）
     this.age = 0;
     this.alive = true;             // ⚠ 必须显式初始化：否则 !undefined === true，全体开局即判死
   }
@@ -546,6 +627,20 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     grid = null;
     phaseEMA = -1;
     throughput.in = 0; throughput.out = 0; throughput.ticks = 0;
+    // 守恒系统：初始撒入一批行料作为"物质总量"（此后只有 1 进 1 出，不再凭空产生）
+    if (P.wuxing) {
+      for (var sm = 0; sm < P.seedMat; sm++) {
+        materials.push({ x: Math.random() * W, y: Math.random() * H, p: (Math.random() * 5) | 0, yin: 0 });
+      }
+      // 投喂口：5 个，环上均布（与族群同方位），每步向外注入行料
+      feeders = [];
+      var fR = Math.min(W, H) * 0.42;
+      for (var fi = 0; fi < 5; fi++) {
+        var fang = (fi / 5) * Math.PI * 2 - Math.PI / 2;
+        feeders.push({ x: W * 0.5 + Math.cos(fang) * fR, y: H * 0.5 + Math.sin(fang) * fR });
+      }
+      for (var fa = 0; fa < 5; fa++) { feedAccY[fa] = 0; feedAccN[fa] = 0; }
+    }
     wipeCounts();
     if (P.foodStrength > 0) F.init();
     if (bctx) { bctx.fillStyle = '#06090d'; bctx.fillRect(0, 0, W, H); }
@@ -611,8 +706,9 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       matGrid.b[k].push(d);
     }
   }
-  function nearestMaterial(x, y, prod, maxR) {
+  function nearestMaterial(x, y, prod, maxR, yin) {
     if (!matGrid) return null;
+    var want = yin ? 1 : 0;
     var cell = matGrid.cell, cols = matGrid.cols, rows = matGrid.rows;
     var cx = Math.min(cols - 1, Math.max(0, (x / cell) | 0));
     var cy = Math.min(rows - 1, Math.max(0, (y / cell) | 0));
@@ -627,6 +723,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
         for (var i = 0; i < arr.length; i++) {
           var d = arr[i];
           if (d.p !== prod) continue;
+          if ((d.yin ? 1 : 0) !== want) continue;
           var dx = d.x - x, dy = d.y - y, d2 = dx * dx + dy * dy;
           if (d2 < bd) { bd = d2; best = { d: d, dx: dx, dy: dy, d2: d2 }; }
         }
@@ -657,34 +754,25 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
   function steer(b, d2max, r, dt) {
     var i, o;
 
-    // 0a) 五行之力：克（追捕猎物）、避（逃天敌）、生（觅食材料）
+    // 0a) 五行之力（主动力，默认关闭）：细胞是随机游走的颗粒，碰到料才算。
+    //     若把 forageGain / fleeYinGain 调 >0，则改为"主动趋利避害"（实验旋钮）。
     if (P.wuxing) {
-      var myPrey = WX.prey(b.type), myPred = WX.pred(b.type), myProd = (b.type + 4) % 5;
-      var bpD = 1e18, bpx = 0, bpy = 0, bqD = 1e18, bqx = 0, bqy = 0;
-      for (i = 0; i < r.length; i++) {
-        o = r[i];
-        if (o === b) continue;
-        var ox = wrapDelta(o.x - b.x, W), oy = wrapDelta(o.y - b.y, H);
-        var o2 = ox * ox + oy * oy;
-        if (o.type === myPrey) { if (o2 < bpD) { bpD = o2; bpx = ox; bpy = oy; } }
-        else if (o.type === myPred) { if (o2 < bqD) { bqD = o2; bqx = ox; bqy = oy; } }
-      }
-      // 克：追捕猎物（越近越用力）
-      if (bpD < 1e18 && P.chaseGain > 0) {
-        var pd = Math.sqrt(bpD) || 1e-6, cg = P.chaseGain * 0.075;
-        b.ax += bpx / pd * cg; b.ay += bpy / pd * cg;
-      }
-      // 避：逃离天敌
-      if (bqD < 1e18 && P.fleeGain > 0) {
-        var qd = Math.sqrt(bqD) || 1e-6, fg = P.fleeGain * 0.075;
-        b.ax -= bqx / qd * fg; b.ay -= bqy / qd * fg;
-      }
-      // 生：觅食可食材料点（我的上游所产）
+      var myProd = (b.type + 4) % 5;        // 我吃：上游(i-1)产的阳料
+      var myToxin = (b.type + 3) % 5;       // 我该清理：我所克者(i+2)的阴料
+      // 生：趋近可食的阳料（营养）
       if (P.forageGain > 0) {
-        var nm = nearestMaterial(b.x, b.y, myProd, 240);
+        var nm = nearestMaterial(b.x, b.y, myProd, P.forageR, 0);
         if (nm) {
           var gd = Math.sqrt(nm.d2) || 1e-6, gg = P.forageGain * 0.06;
           b.ax += nm.dx / gd * gg; b.ay += nm.dy / gd * gg;
+        }
+      }
+      // 避害：躲开要花能量清理的阴料
+      if (P.fleeYinGain > 0) {
+        var tm = nearestMaterial(b.x, b.y, myToxin, 120, 1);
+        if (tm) {
+          var td = Math.sqrt(tm.d2) || 1e-6, tg = P.fleeYinGain * 0.05;
+          b.ax -= tm.dx / td * tg; b.ay -= tm.dy / td * tg;
         }
       }
     }
@@ -944,6 +1032,43 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     var k = dt * 60, i, b;
     var contact2 = 15 * 15;
 
+    // 0) 投喂口（"病从口入"）：外部持续输入 —— 这是系统唯一的能量/物质入口。
+    //    每个口 i 每步注入 feedYang[i] 个「阳料」（营养）与 feedYin[i] 个「阴料」（毒素）。
+    //    feedYang 全为 0 → 断供 → 纯耗散 → 必然全死（耗散结构的热力学宿命）。
+    if (P.wuxing && feeders.length) {
+      var feedScale = dt * 60;                       // 归一化到"每步 = 1/60 秒"
+      for (var fk = 0; fk < 5; fk++) {
+        var fy = P.feedYang[fk], fn = P.feedYin[fk];
+        // 阳料投喂 = 外部能量把「第 i 行的废物（阴料）」回收成「营养（阳料）」——
+        // 物质守恒（阴→阳，总数不变），能量来自外部。断供则废物不再变回营养。
+        if (fy > 0) {
+          feedAccY[fk] += fy * feedScale;
+          var fguard = 0;
+          while (feedAccY[fk] >= 1 && fguard++ < 80) {
+            var found = -1;
+            for (var mj = 0; mj < materials.length; mj++) {
+              var mdj = materials[mj];
+              if (mdj.p === fk && mdj.yin) { found = mj; break; }
+            }
+            if (found < 0) break;
+            feedAccY[fk] -= 1;
+            materials[found].yin = 0;              // 废物 → 营养（外部能量驱动的回收）
+            materials[found].x = (feeders[fk].x + (Math.random() - 0.5) * P.feedR * 2 + W) % W;
+            materials[found].y = (feeders[fk].y + (Math.random() - 0.5) * P.feedR * 2 + H) % H;
+          }
+        }
+        // 阴料投喂 = 直接从外部注入毒素（"病从口入"的另一半：吃错东西）
+        if (fn > 0) {
+          feedAccN[fk] += fn * feedScale;
+          while (feedAccN[fk] >= 1 && materials.length < P.dotCap) {
+            feedAccN[fk] -= 1;
+            var fa2 = Math.random() * 6.2832, fr2 = Math.random() * P.feedR;
+            materials.push({ x: (feeders[fk].x + Math.cos(fa2) * fr2 + W) % W, y: (feeders[fk].y + Math.sin(fa2) * fr2 + H) % H, p: fk, yin: 1 });
+          }
+        }
+      }
+    }
+
     // 1) 代谢（阴）：能量被消耗，且随年龄加速 —— 阳（增殖）最终会被阴（凋亡）追上
     for (i = 0; i < boids.length; i++) {
       b = boids[i];
@@ -952,62 +1077,55 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       if (b.E < 0) b.E = 0;
     }
 
-    // 2) 产出（生）：概率在自身位置留下一个材料点（生产者 = 自身族群）
-    if (materials.length < P.dotCap) {
-      for (i = 0; i < boids.length; i++) {
-        b = boids[i];
-        if (Math.random() < P.produceRate * k) {
-          materials.push({ x: b.x, y: b.y, p: b.type });
-          WXstats.produced[b.type]++;
+    // 2) 排出（转化·守恒）：料不再凭空产生 —— 只有「吃进一份」才「排出一份」。
+    //    排出在进食环节完成（见 3），系统内物质总量恒 = seedMat，不增不减。
+    buildMatGrid();
+
+    // 3) 进食（生·增益）：吃掉近处"上游(i-1)产的阳料" → 物质 M+ 且供能 E+
+    //    同一 tick 多个个体可能扑向同一个点 —— 吃掉后打标记（p=-9），后来者就找不到它了。
+    for (i = 0; i < boids.length; i++) {
+      b = boids[i];
+      var ym = nearestMaterial(b.x, b.y, (b.type + 4) % 5, P.absorbR, 0);
+      if (ym) {
+        b.E += P.nutrientE;                            // 从"投喂来的阳料"里取走能量（唯一能量来源）
+        WXstats.consumed[b.type]++;                    // 摄食计数（按消费者族群）
+        ym.d.p = -9;                                   // 阳料被吃 → 移除
+        var idx = materials.indexOf(ym.d);
+        if (idx >= 0) materials.splice(idx, 1);
+        // 代谢：吃进一份营养 → 排出恰好一份「自己的废物（阴料）」，由「我所克者」(i+2) 清理。
+        // 物质不增殖（1 进 1 出），能量来自投喂，废物是唯一出口。
+        if (materials.length < P.dotCap) {
+          materials.push({ x: b.x, y: b.y, p: b.type, yin: 1 });
+          WXstats.yinProduced[b.type]++;
         }
       }
     }
 
-    // 3) 进食（生）：吃掉近处属于自己的材料点 → 物质 M+
-    //    同一 tick 多个个体可能扑向同一个点 —— 吃掉后打标记（p=-9），后来者就找不到它了。
-    buildMatGrid();
-    for (i = 0; i < boids.length; i++) {
-      b = boids[i];
-      var prod = (b.type + 4) % 5;
-      var nm = nearestMaterial(b.x, b.y, prod, P.absorbR);
-      if (nm) {
-        b.M += P.dotGain;
-        WXstats.consumed[b.type]++;                    // 耗料计数（按消费者族群）
-        nm.d.p = -9;                                   // 标记已吃掉
-        var idx = materials.indexOf(nm.d);
-        if (idx >= 0) materials.splice(idx, 1);
-      }
-    }
-
-    // 4) 相克：接近猎物 → 吞噬（猎物死，捕食者获得能量 E）
+    // 4) 排污/代谢（克·减益）：碰到"我所克者(i+2)的阴料" → 花能量清理它（E−）
+    //    "克"的本义：不是咬死对方，而是替上游处理代谢废物、要付出能量代价。
     for (i = 0; i < boids.length; i++) {
       b = boids[i];
       if (!b.alive) continue;
-      var pt = WX.prey(b.type);
-      var nb = nearBoids(b.x, b.y);
-      for (var j = 0; j < nb.length; j++) {
-        var q = nb[j];
-        if (q === b || !q.alive || q.type !== pt) continue;
-        var dx = wrapDelta(q.x - b.x, W), dy = wrapDelta(q.y - b.y, H);
-        if (dx * dx + dy * dy < contact2) {
-          q.alive = false;
-          b.E = Math.min(1.2, b.E + P.preyGain);
-          WXstats.eaten[q.type]++;
-        }
+      var tm2 = nearestMaterial(b.x, b.y, (b.type + 3) % 5, P.absorbR, 1);
+      if (tm2) {
+        b.E -= P.yinCost;                    // 碰到上游的废物 → 损耗能量（= 相克）。
+        WXstats.yinConsumed[b.type]++;       // 废物不消失（持续污染），只由投喂口回收成营养。
       }
     }
 
-    // 5) 判定：E≤0 → 死（阴）；M≥阈值 → 分裂（阳）
+    // 5) 判定：E≤0 → 死（阴）；E≥splitE → 分裂成两个 E/2 的细胞（阳·能量守恒）
     var survivors = [], newborns = [];
     for (i = 0; i < boids.length; i++) {
       b = boids[i];
       if (!b.alive || b.E <= 0) { WXstats.died[b.type]++; continue; }
-      if (b.M >= P.splitM && boids.length + newborns.length < 4000) {
-        b.M -= P.splitM;                 // 消耗物质
-        b.E *= 0.82;                     // 分裂耗能
+      if (b.E >= P.splitE && boids.length + newborns.length < 4000) {
+        var half = b.E * 0.5;            // 100 → 50 + 50
+        b.E = half;                      // 母细胞留一半
         var na = Math.random() * Math.PI * 2;
         var ch = new Boid(b.x, b.y, na, (Math.random() * 1e6) | 0, b.type);
-        ch.E = b.E * 0.9; ch.M = 0.15;
+        ch.E = half;                     // 子细胞拿另一半
+        ch.x = (b.x + Math.cos(na) * 4 + W) % W;
+        ch.y = (b.y + Math.sin(na) * 4 + H) % H;
         newborns.push(ch);
         WXstats.born[b.type]++;
       }
@@ -1030,13 +1148,15 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
           WXstats.rateDied[i] = (WXstats.died[i] - WXstats.prev.died[i]) * K;
           WXstats.rateProd[i] = (WXstats.produced[i] - WXstats.prev.produced[i]) * K;
           WXstats.rateCons[i] = (WXstats.consumed[i] - WXstats.prev.consumed[i]) * K;
+          WXstats.rateYin[i] = (WXstats.yinConsumed[i] - WXstats.prev.yinConsumed[i]) * K;
         }
       }
       WXstats.prev = { born: WXstats.born.slice(), died: WXstats.died.slice(),
-                       produced: WXstats.produced.slice(), consumed: WXstats.consumed.slice() };
+                       produced: WXstats.produced.slice(), consumed: WXstats.consumed.slice(),
+                       yinConsumed: WXstats.yinConsumed.slice() };
       // 材料点现存数量（按生产者族群）
       for (i = 0; i < 5; i++) WXstats.matCount[i] = 0;
-      for (i = 0; i < materials.length; i++) { var pp = materials[i].p; if (pp >= 0) WXstats.matCount[pp]++; }
+      for (i = 0; i < materials.length; i++) { var pp = materials[i].p, yf = materials[i].yin; if (pp >= 0 && !yf) WXstats.matCount[pp]++; }
       WXstats.history.push(WXstats.pop.slice());
       if (WXstats.history.length > 600) WXstats.history.shift();
     }
@@ -1111,7 +1231,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
   // 族群图例：每族数量 + 柱状条 + 数量时间曲线 —— 看"谁在旺、谁在衰"
   function drawLegend() {
     // 监视器：每族一行 —— 数量 / 繁殖速率 / 死亡速率 / 产料速率 / 耗料速率 / 料存量
-    var pw = 312, x0 = Math.max(10, W - pw - 14), y0 = 14, lh = 19;
+    var pw = 412, x0 = Math.max(10, W - pw - 14), y0 = 14, lh = 19;
     bctx.textBaseline = 'middle';
     var padL = function (s, w) { s = String(s); while (s.length < w) s = ' ' + s; return s; };
     var n1 = function (v) { return (Math.round(v * 10) / 10).toFixed(1); };
@@ -1129,6 +1249,10 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     bctx.fillStyle = '#6fd2e8'; bctx.fillText('产', x0 + 192, y0 - 2);
     bctx.fillStyle = '#f0a85a'; bctx.fillText('耗', x0 + 226, y0 - 2);
     bctx.fillStyle = '#adc0d2'; bctx.fillText('料', x0 + 262, y0 - 2);
+    bctx.fillStyle = '#8fb8ff'; bctx.fillText('阴', x0 + 300, y0 - 2);
+    bctx.fillStyle = '#ffd64a'; bctx.fillText('阳', x0 + 382, y0 - 2);
+    // 阴阳比例条：左阴（蓝）| 分隔 | 右阳（黄）—— 分界线的位置 = 阴阳之比
+    bctx.fillStyle = '#4a5f75'; bctx.fillText('比例', x0 + 320, y0 - 2);
     // 速率单位提示：总量（次/秒，∝ 数量）vs 个体（每百个体/秒，内禀率）
     bctx.fillStyle = '#4a5f75';
     bctx.fillText(P.monPerCapita ? '速率·每百个体/秒' : '速率·次/秒', x0 + 48, y0 - 2);
@@ -1136,6 +1260,12 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     // 数量进度条的最大值（各族群取当前最大，做成相对刻度）
     var maxPop = 1, sumPop = 0;
     for (var q = 0; q < 5; q++) { if (WXstats.pop[q] > maxPop) maxPop = WXstats.pop[q]; sumPop += WXstats.pop[q]; }
+    // 料场构成（按生产者族群 × 阴阳）—— 供"阴阳比例条"用
+    var matByP = [0, 0, 0, 0, 0], matYinByP = [0, 0, 0, 0, 0];
+    for (var mi2 = 0; mi2 < materials.length; mi2++) {
+      var dm = materials[mi2]; if (dm.p < 0) continue;
+      if (dm.yin) matYinByP[dm.p]++; else matByP[dm.p]++;
+    }
 
     bctx.font = '600 11px ui-monospace,Consolas,monospace';
     for (var t = 0; t < 5; t++) {
@@ -1163,6 +1293,30 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       bctx.fillStyle = '#6fd2e8'; bctx.fillText(padL(n1(rv(WXstats.rateProd[t])), 4), x0 + 190, y);
       bctx.fillStyle = '#f0a85a'; bctx.fillText(padL(n1(rv(WXstats.rateCons[t])), 4), x0 + 224, y);
       bctx.fillStyle = '#adc0d2'; bctx.fillText(padL(WXstats.matCount[t], 4), x0 + 260, y);
+
+      // —— 阴阳比例条：左阴（蓝）右阳（黄），分界线位置 = 该行面临的"阴料 : 阳料" ——
+      //    阳料 = 它「能吃的」（上游 i-1 产的）；阴料 = 「威胁它的」（i+2 产的废物）。
+      var ybX = x0 + 296, ybW = 88, ybH = 11;
+      var yangV = matByP[(t + 4) % 5];                    // 可食阳料（库存）
+      var yinV  = matYinByP[(t + 3) % 5];                 // 威胁阴料（库存）
+      var yTot  = yangV + yinV;
+      bctx.fillStyle = 'rgba(120,150,180,0.16)';
+      bctx.fillRect(ybX, y - ybH / 2, ybW, ybH);
+      if (yTot > 1e-6) {
+        var yinFrac = yinV / yTot;
+        // 阴（左，蓝）
+        bctx.fillStyle = 'rgba(120,168,255,0.80)';
+        bctx.fillRect(ybX, y - ybH / 2, ybW * yinFrac, ybH);
+        // 阳（右，黄）
+        bctx.fillStyle = 'rgba(255,214,74,0.82)';
+        bctx.fillRect(ybX + ybW * yinFrac, y - ybH / 2, ybW * (1 - yinFrac), ybH);
+        // 分隔线（分界处）—— 画粗 = 阴阳断口（"爻"的断口）
+        bctx.fillStyle = '#0a0f16';
+        bctx.fillRect(ybX + ybW * yinFrac - 2, y - ybH / 2, 4, ybH);
+      } else {
+        bctx.fillStyle = 'rgba(120,150,180,0.35)';
+        bctx.fillRect(ybX + ybW / 2 - 1, y - ybH / 2, 2, ybH);
+      }
     }
     var hx = x0, hy = y0 + 6 * lh + 6, hw = pw - 20, hh = 50;
     bctx.fillStyle = 'rgba(10,16,22,0.55)';
@@ -1186,6 +1340,73 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     bctx.fillStyle = '#6b7f93';
     bctx.font = '11px ui-monospace,monospace';
     bctx.fillText('族群数量（时间→）', hx + 2, hy + hh + 10);
+  }
+
+  // 右下角图例：把"涌现规则"写清楚 —— 生克 / 生死 / 投喂 / 守恒
+  function drawRules() {
+    var names = ['木', '火', '土', '金', '水'];
+    var pw = 372, lh = 18, pad = 12;
+    var lines = [
+      ['title', '五行涌现 · 规则'],
+      ['gap',   ''],
+      ['sec',   '生 · 阳料（黄辉）'],
+      ['txt',   'i 排出营养 → i+1 吃掉 → 能量 E +'],
+      ['sec',   '克 · 阴料（白辉）'],
+      ['txt',   'i 排出废物 → i+2 碰到 → 能量 E −'],
+      ['gap',   ''],
+      ['sec',   '生死 · 能量是唯一货币'],
+      ['txt',   'E = 0 → 死（阴）；E = 100 → 分裂成两个 E=50（阳）'],
+      ['gap',   ''],
+      ['sec',   '投喂口 · 病从口入'],
+      ['txt',   '外部输入是唯一能量源；断供 → 必然全死（耗散结构）'],
+      ['txt',   '物质守恒：总量恒定，不增殖（吃一份才排一份）'],
+      ['gap',   ''],
+      ['sec',   '五行 · 相生相克循环']
+    ];
+    var bodyH = 0; for (var li = 0; li < lines.length; li++) bodyH += (lines[li][0] === 'gap' ? 8 : lh);
+    var ph = bodyH + pad * 2 + 22;
+    var x0 = W - pw - 14, y0 = H - ph - 14;
+
+    // 背板
+    bctx.fillStyle = 'rgba(10,16,22,0.72)';
+    bctx.fillRect(x0, y0, pw, ph);
+    bctx.strokeStyle = 'rgba(120,150,180,0.28)';
+    bctx.lineWidth = 1; bctx.strokeRect(x0 + 0.5, y0 + 0.5, pw - 1, ph - 1);
+
+    bctx.textBaseline = 'middle';
+    var y = y0 + pad + 8;
+    for (var k = 0; k < lines.length; k++) {
+      var kind = lines[k][0], tx = lines[k][1];
+      if (kind === 'gap') { y += 8; continue; }
+      if (kind === 'title') {
+        bctx.font = 'bold 14px ui-monospace,monospace';
+        bctx.fillStyle = '#cfe3f5'; bctx.fillText(tx, x0 + pad, y);
+      } else if (kind === 'sec') {
+        bctx.font = 'bold 12px ui-monospace,monospace';
+        bctx.fillStyle = '#9fb8cf'; bctx.fillText(tx, x0 + pad, y);
+      } else {
+        bctx.font = '11.5px ui-monospace,monospace';
+        bctx.fillStyle = '#8ea6bd'; bctx.fillText(tx, x0 + pad + 2, y);
+      }
+      y += lh;
+    }
+    // 五行色块（带相生箭头）
+    var sw = 30, gap2 = 12, sx = x0 + pad, sy = y - 2;
+    for (var e = 0; e < 5; e++) {
+      bctx.fillStyle = WX.css[e];
+      bctx.beginPath(); bctx.arc(sx + sw / 2, sy, 7, 0, 6.2832); bctx.fill();
+      bctx.font = 'bold 11px ui-monospace,monospace';
+      bctx.fillStyle = '#cfe3f5';
+      bctx.textAlign = 'center'; bctx.fillText(names[e], sx + sw / 2, sy + 17); bctx.textAlign = 'left';
+      if (e < 4) {
+        bctx.strokeStyle = 'rgba(150,175,200,0.5)'; bctx.lineWidth = 1;
+        bctx.beginPath(); bctx.moveTo(sx + sw - 2, sy); bctx.lineTo(sx + sw + gap2 - 6, sy); bctx.stroke();
+        bctx.beginPath(); bctx.moveTo(sx + sw + gap2 - 6, sy);
+        bctx.lineTo(sx + sw + gap2 - 10, sy - 2.5); bctx.moveTo(sx + sw + gap2 - 6, sy);
+        bctx.lineTo(sx + sw + gap2 - 10, sy + 2.5); bctx.stroke();
+      }
+      sx += sw + gap2;
+    }
   }
 
   // ---------- 绘制 ----------
@@ -1213,16 +1434,30 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       }
     }
 
-    // 材料点（"豆豆"）：颜色 = 生产它的族群；不会流动、会堆积
+    // 投喂口（"病从口入"）：外部输入的位置，画成醒目的"口"
+    if (P.wuxing && feeders.length) {
+      for (var fdi = 0; fdi < feeders.length; fdi++) {
+        var fp = feeders[fdi], frgb2 = WX.rgb[fdi];
+        bctx.beginPath();
+        bctx.arc(fp.x, fp.y, 14, 0, 6.2832);
+        bctx.strokeStyle = 'rgba(' + frgb2[0] + ',' + frgb2[1] + ',' + frgb2[2] + ',0.85)';
+        bctx.lineWidth = 2; bctx.stroke();
+        bctx.beginPath();
+        bctx.arc(fp.x, fp.y, 5, 0, 6.2832);
+        bctx.fillStyle = 'rgba(' + frgb2[0] + ',' + frgb2[1] + ',' + frgb2[2] + ',0.95)';
+        bctx.fill();
+      }
+    }
+
+    // 行料（发光粒子）：核心 1px = 族群底色（哪一行产的）；辉光 = 阴阳
+    //   黄辉 = 阳料（营养，馈赠下游）；白辉 = 阴料（废物，需下游回收）。
     if (P.wuxing && materials.length) {
+      if (!glowSprites) buildGlowSprites();
+      var spHalf = 6;
       for (var mi = 0; mi < materials.length; mi++) {
         var md = materials[mi];
         if (md.p < 0) continue;
-        var mrgb = WX.rgb[md.p];
-        bctx.fillStyle = 'rgba(' + mrgb[0] + ',' + mrgb[1] + ',' + mrgb[2] + ',0.55)';
-        bctx.beginPath();
-        bctx.arc(md.x, md.y, 1.8, 0, 6.2832);
-        bctx.fill();
+        bctx.drawImage(glowSprites[md.p][md.yin ? 1 : 0], md.x - spHalf, md.y - spHalf);
       }
     }
 
@@ -1245,7 +1480,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       // 颜色 = 族群；alpha = 生气（能量 E）—— 气尽则淡，alpha→0 即亡。
       if (P.wuxing) {
         var wcell = WX.rgb[b.type];
-        var walu = Math.max(0.04, Math.min(1, b.E / 0.72));
+        var walu = Math.max(0.04, Math.min(1, b.E / P.splitE));
         var wr = sz * (0.75 + 0.5 * walu);           // 气足则略大，气衰则缩
         bctx.fillStyle = 'rgba(' + wcell[0] + ',' + wcell[1] + ',' + wcell[2] + ',' + walu.toFixed(2) + ')';
         bctx.beginPath();
@@ -1275,7 +1510,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       bctx.fill();
     }
 
-    if (P.wuxing) drawLegend();
+    if (P.wuxing) { drawLegend(); drawRules(); }
 
     // 视野范围可视化（三者叠加，共用同一套几何与判定）：
     //   1) 感知圆   —— 距离上限 radius
@@ -1532,8 +1767,22 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     bindRange('foodRegrow'); bindRange('eatRate'); bindRange('chemoGain'); bindRange('blockAvoid');
     // 五行生态：个体数改动要重置；其余实时生效
     bindRange('perType', function () { reset(); });
-    bindRange('produceRate'); bindRange('metabolism'); bindRange('preyGain'); bindRange('splitM');
-    bindRange('chaseGain'); bindRange('fleeGain'); bindRange('forageGain');
+    bindRange('pYang'); bindRange('metabolism'); bindRange('splitE');
+    bindRange('nutrientE'); bindRange('yinCost'); bindRange('forageGain'); bindRange('forageR'); bindRange('fleeYinGain'); bindRange('feedR');
+    // 投喂口滑条（数组参数 feedYang[0..4] / feedYin[0..4]）
+    (function () {
+      function bindFeedArr(key, idx) {
+        var el = document.getElementById(key + idx);
+        if (!el) return;
+        var valEl = document.getElementById('v-' + key + idx);
+        el.min = 0; el.max = 5; el.step = 0.1; el.value = P[key][idx];
+        el.__sync = upd;   // 供外部（如 API 改参）刷新面板
+        function upd() { if (valEl) valEl.textContent = Number(P[key][idx]).toFixed(1); }
+        el.addEventListener('input', function () { P[key][idx] = parseFloat(el.value); upd(); });
+        upd();
+      }
+      for (var fbi = 0; fbi < 5; fbi++) { bindFeedArr('feedYang', fbi); bindFeedArr('feedYin', fbi); }
+    })();
     // 活性（气）：typeSpeed 是数组，手动绑定（每族一个滑块）
     for (var sIdx = 0; sIdx < 5; sIdx++) {
       (function (ti) {
@@ -1687,6 +1936,7 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
         foodTotal: function () { return F.total(); },
         WX: WX, WXstats: WXstats,
         materials: function () { return materials; },
+        feeders: function () { return feeders; },
         ecology: ecology,
         ringStats: function () { return { drawn: ringDrawn, isolated: ringIsolated, links: ringLinks }; }
       });
