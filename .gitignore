@@ -1,0 +1,13 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# 临时/中间产物
+*.tmp
+.tmp*
+_*.log
+
+# Python（本地起服务器时）
+__pycache__/
+*.pyc

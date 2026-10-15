@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boids · 涌现的鸟群</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --bg:#06090d; --panel:#0d141b; --line:#1b2b3a; --dim:#7d95a8;
+    --txt:#d8e6f0; --hi:#5fd3ff; --hi2:#ffd166; --good:#4ade80;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font:13px/1.5 ui-monospace,"Cascadia Mono",Consolas,"Sarasa Mono SC",monospace;overflow:hidden}
+  #app{position:relative;width:100vw;height:100vh}
+  canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
+
+  #panel{position:absolute;top:14px;left:14px;width:302px;max-height:calc(100vh - 28px);
+    overflow-y:auto;background:color-mix(in srgb,var(--panel) 88%,transparent);
+    border:1px solid var(--line);border-radius:10px;padding:14px 15px 16px;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 12px 40px rgba(0,0,0,.55);transition:opacity .18s,transform .18s}
+  #panel.hide{opacity:0;transform:translateX(-16px);pointer-events:none}
+  #panel::-webkit-scrollbar{width:8px}
+  #panel::-webkit-scrollbar-thumb{background:#22384a;border-radius:4px}
+
+  h1{font-size:13px;margin:0 0 2px;letter-spacing:.08em;font-weight:700;color:var(--hi)}
+  .sub{color:var(--dim);font-size:11px;margin:0 0 12px;letter-spacing:.02em}
+  .group{margin:0 0 12px}
+  .gname{font-size:10px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;
+    border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:9px}
+  .row{margin:0 0 9px}
+  .rt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  label{font-size:11.5px;color:#b7cbd9;cursor:pointer}
+  label .en{color:#4d687c;font-size:10px}
+  .val{font-size:11px;color:var(--hi2);font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:3px;background:#22384a;border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4.5px;
+    border-radius:50%;background:var(--hi);border:none;box-shadow:0 0 8px rgba(95,211,255,.75)}
+  input[type=range]::-moz-range-track{height:3px;background:#22384a;border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border:none;border-radius:50%;
+    background:var(--hi);box-shadow:0 0 8px rgba(95,211,255,.75)}
+
+  .toggles,.btns{display:flex;flex-wrap:wrap;gap:6px 12px}
+  #phi-head{margin:2px 0 12px;padding:10px 11px;border:1px solid var(--line);border-radius:8px;
+    background:linear-gradient(180deg,rgba(95,211,255,.05),transparent)}
+  #phi-label{font-size:10px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+  #phi-big{font-size:27px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;
+    color:var(--hi2);transition:color .25s}
+  #phi-big small{font-size:11px;font-weight:400;color:var(--dim);margin-left:6px;letter-spacing:.04em}
+  #phi-bar{height:4px;border-radius:2px;margin-top:8px;overflow:hidden;background:#22384a}
+  #phi-fill{height:100%;width:0%;transition:width .25s,background .25s;background:var(--hi2)}
+  #phi-word{font-size:11px;margin-top:6px;font-weight:600}
+
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .presets button{flex:1 1 auto;white-space:nowrap}
+
+  .btns,.presets{display:flex;flex-wrap:wrap;gap:6px}
+  .tg{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#a9bfcd;cursor:pointer;user-select:none}
+  .tg input{accent-color:var(--hi);cursor:pointer}
+  button{font:inherit;font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;
+    background:#14283a;color:#cfe6f5;border:1px solid #24455e;transition:.13s}
+  button:hover{background:#1d3d56;border-color:var(--hi);color:#fff}
+  button:active{transform:translateY(1px)}
+
+  #info{margin-top:13px;padding-top:11px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px}
+  #info span:nth-child(odd){color:var(--dim)}
+  #info span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums;color:#cfe6f5}
+  #phase{font-weight:700}
+  #hint,.hint{margin-top:11px;font-size:10.5px;line-height:1.65;color:#5d7a8c}
+  .hint b,#hint b{color:#9fc0d4;font-weight:600}
+
+  #legend{position:absolute;right:14px;bottom:14px;font-size:11px;color:#5d7a8c;
+    text-align:right;pointer-events:none;line-height:1.7}
+  #legend b{color:var(--hi)}
+  @media (max-width:760px){#panel{width:calc(100vw - 28px)}#legend{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+
+  <div id="panel">
+    <h1>BOIDS · 涌现的鸟群</h1>
+    <p class="sub">Reynolds 1987 &nbsp;/&nbsp; 无中央控制，只有局部规则</p>
+
+    <div id="phi-head">
+      <div id="phi-label">极化序参量 φ · 全局有序度</div>
+      <div id="phi-big"><span id="phi-num">—</span><small id="phi-word"></small></div>
+      <div id="phi-bar"><div id="phi-fill"></div></div>
+    </div>
+
+    <div class="group">
+      <div class="gname">Flocking 权重</div>
+      <div class="row"><div class="rt"><label for="sep">分离 <span class="en">separation</span></label><span class="val" id="v-sep"></span></div><input type="range" id="sep"></div>
+      <div class="row"><div class="rt"><label for="ali">对齐 <span class="en">alignment</span></label><span class="val" id="v-ali"></span></div><input type="range" id="ali"></div>
+      <div class="row"><div class="rt"><label for="coh">聚合 <span class="en">cohesion</span></label><span class="val" id="v-coh"></span></div><input type="range" id="coh"></div>
+    </div>
+
+    <div class="group">
+      <div class="gname">感知与个体</div>
+      <div class="row"><div class="rt"><label for="radius">感知半径 <span class="en">看多远</span></label><span class="val" id="v-radius"></span></div><input type="range" id="radius"></div>
+      <div class="row"><div class="rt"><label for="fov">视野范围 <span class="en">看多宽</span></label><span class="val" id="v-fov"></span></div><input type="range" id="fov"></div>
+      <div class="row"><div class="rt"><label for="count">个体数量</label><span class="val" id="v-count"></span></div><input type="range" id="count"></div>
+      <div class="row"><div class="rt"><label for="speed">基础速度</label><span class="val" id="v-speed"></span></div><input type="range" id="speed"></div>
+    </div>
+
+    <div class="group">
+      <div class="gname">噪声 · 相变的关键</div>
+      <div class="row"><div class="rt"><label for="noise">噪声强度 <span class="en">noise η</span></label><span class="val" id="v-noise"></span></div><input type="range" id="noise"></div>
+      <div id="hint">噪声高 → 混乱；缓慢下调，穿过某个<b>临界值</b>的瞬间，全局有序会自发出现。<br>
+        <b>别急着下结论</b>：从随机初态到 φ 冲上 0.9，默认参数下中位约 <b>40 秒</b>（实测 20–60 秒，取决于初态）。
+        这不是卡顿 —— 每只鸟只看得见邻居，秩序只能逐跳传播。</div>
+      <div class="presets">
+        <button id="btn-vicsek">Vicsek 模式</button>
+        <button id="btn-critical">临界态</button>
+        <button id="btn-noisy">全随机</button>
+        <button id="btn-noise-sweep">自动扫 η</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="gname">显示</div>
+      <div class="toggles">
+        <label class="tg"><input type="checkbox" id="t-trails">拖尾</label>
+        <label class="tg"><input type="checkbox" id="t-speed">速度着色</label>
+        <label class="tg"><input type="checkbox" id="t-grid">空间网格</label>
+      </div>
+      <div class="row" style="margin-top:9px">
+        <div class="rt"><label>视野范围 · 看多远 + 看多宽</label></div>
+        <div class="toggles">
+          <label class="tg"><input type="radio" name="ringmode" value="0">不画</label>
+          <label class="tg"><input type="radio" name="ringmode" value="1" checked>抽样</label>
+          <label class="tg"><input type="radio" name="ringmode" value="2">全部</label>
+        </div>
+      </div>
+      <div class="btns">
+        <button id="btn-pause">暂停 (空格)</button>
+        <button id="btn-reset">重置</button>
+      </div>
+    </div>
+
+    <div id="info">
+      <span>帧率</span><span id="s-fps">—</span>
+      <span>邻近度 &lt;n&gt;</span><span id="s-nb">—</span>
+      <span>平均速度</span><span id="s-spd">—</span>
+      <span>感知半径</span><span id="s-rad">—</span>
+      <span>视野范围</span><span id="s-fov">—</span>
+      <span>已画 / 孤立 / 连线</span><span id="s-ring">—</span>
+    </div>
+
+    <div class="hint">左键拖拽 = 吸引 · 右键拖拽 = 驱散 · 双击 = 换种子 · <b>C</b> 切换感知圈 · <b>H</b> 收起面板</div>
+  </div>
+
+  <div id="legend">
+    <b>青圈</b> 感知半径 · <b>扇形</b> 视野范围 · <b>红圈</b> 孤立无邻居 · <b>绿线</b> 真正的邻居<br>
+    <b>φ = 1</b> 全体同向 &nbsp;·&nbsp; <b>φ = 0</b> 方向随机（φ &gt; 0.9 中位约 40 秒）<br>
+    <b>空格</b> 暂停 &nbsp;<b>R</b> 重置 &nbsp;<b>C</b> 切换视野可视化 &nbsp;<b>H</b> 收起面板
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var hasDOM = (typeof document !== 'undefined') && !!document.getElementById;
+  var $ = function (id) { return hasDOM ? document.getElementById(id) : null; };
+
+  var cv = $('cv');
+  var ctx = cv ? cv.getContext('2d', { alpha: false }) : null;
+
+  // ---------- 可调参数（默认值）----------
+  var P = {
+    sep: 1.20, ali: 1.40, coh: 0.85,
+    radius: 90, fov: 340, count: 520, speed: 1.85,
+    noise: 0.22,
+    ringMode: 1, ringCount: 60,
+    trails: false, colspd: true, grid: false
+  };
+
+  // ---------- 运行时状态 ----------
+  var boids = [], grid = null, acc = 0, last = 0, frames = 0, fpsT = 0, fps = 0;
+  var phaseEMA = -1, fpsCap = 0, t = 0, sweepDir = 0;
+  var ringDrawn = 0, ringIsolated = 0, ringLinks = 0;   // 供 HUD 显示视野可视化覆盖情况
+  var mouse = { x: 0, y: 0, inside: false, down: 0, target: null, vx: 0, vy: 0, px: 0, py: 0 };
+
+  var CFG = {
+    sep:    { min: 0,   max: 3,    step: 0.01, fmt: function (v) { return v.toFixed(2); } },
+    ali:    { min: 0,   max: 3,    step: 0.01, fmt: function (v) { return v.toFixed(2); } },
+    coh:    { min: 0,   max: 3,    step: 0.01, fmt: function (v) { return v.toFixed(2); } },
+    radius: { min: 16,  max: 160,  step: 1,    fmt: function (v) { return v.toFixed(0) + ' px'; } },
+    fov:    { min: 120, max: 360,  step: 2,    fmt: function (v) { return v.toFixed(0) + '°'; } },
+    count:  { min: 40,  max: 1200, step: 10,   fmt: function (v) { return v.toFixed(0); } },
+    speed:  { min: 0.4, max: 4.5,  step: 0.05, fmt: function (v) { return v.toFixed(2); } },
+    noise:  { min: 0,   max: 2.5,  step: 0.01, fmt: function (v) { return v.toFixed(2); } }
+  };
+
+  var COS_LIMIT = -1;          // 由 fov 推得的 cos 阈值（-1 表示无角度限制）
+  var FOV_LIMITED = true;      // fov 是否真的限制角度（360° 时为 false）
+  var hasOwn = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
+  // ---------- 尺寸 ----------
+  var W = 960, H = 640, DPR = 1;
+  var bg = null, bctx = null, maxR = 200;
+
+  function resize() {
+    DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    W = Math.max(320, window.innerWidth);
+    H = Math.max(240, window.innerHeight);
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    maxR = 0.5 * Math.sqrt(W * W + H * H);
+    bg = document.createElement('canvas');
+    bg.width = W; bg.height = H;
+    bctx = bg.getContext('2d');
+    if (bctx) { bctx.fillStyle = '#06090d'; bctx.fillRect(0, 0, W, H); }
+    for (var i = 0; i < boids.length; i++) wrap(boids[i]);
+  }
+
+  // ---------- 空间网格 ----------
+  // 均匀网格：cell = 感知半径，所以只需检查 3x3 个桶即可覆盖全部候选邻居。
+  // 桶用环形索引（取模），与 wrap-around 边界一致。
+  function makeGrid(cell) {
+    var cols = Math.max(1, Math.ceil(W / cell));
+    var rows = Math.max(1, Math.ceil(H / cell));
+    return { cell: cell, cols: cols, rows: rows, buckets: new Array(cols * rows) };
+  }
+  function cellIndex(g, b) {
+    var cx = (b.x / g.cell) | 0, cy = (b.y / g.cell) | 0;
+    if (cx < 0) cx = 0; else if (cx >= g.cols) cx = g.cols - 1;
+    if (cy < 0) cy = 0; else if (cy >= g.rows) cy = g.rows - 1;
+    return cy * g.cols + cx;
+  }
+
+  // ---------- Boid ----------
+  function Boid(x, y, a, seed) {
+    this.x = x; this.y = y;
+    this.vx = Math.cos(a) * 1.2; this.vy = Math.sin(a) * 1.2;
+    this.ax = 0; this.ay = 0;
+    this.state = 0; this.time = Math.random() * 1000;
+    this.seed = seed || 0;
+  }
+  Boid.prototype.wander = function () {
+    // 轻微摆动，只为了让群体不至于僵硬成一块刚体。
+    // 幅度必须远小于对齐耦合，否则每帧硬改朝向会把共识噪声化掉。
+    this.time += 0.013 + this.seed * 0.00012;
+    var a = Math.atan2(this.vy, this.vx);
+    a += Math.sin(this.time * 1.7) * 0.0022 + Math.sin(this.time * 0.43 + this.seed * 0.7) * 0.0013;
+    var s = Math.hypot(this.vx, this.vy) || 1;
+    this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s;
+  };
+
+  function wrap(b) {
+    if (b.x < 0) b.x += W; else if (b.x >= W) b.x -= W;
+    if (b.y < 0) b.y += H; else if (b.y >= H) b.y -= H;
+  }
+  function wrapDelta(d, span) {
+    if (d > span * 0.5) d -= span; else if (d < -span * 0.5) d += span;
+    return d;
+  }
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  function reset() {
+    boids = [];
+    for (var i = 0; i < P.count; i++) {
+      boids.push(new Boid(Math.random() * W, Math.random() * H, Math.random() * Math.PI * 2, i));
+    }
+    grid = null;
+    phaseEMA = -1;
+    if (bctx) { bctx.fillStyle = '#06090d'; bctx.fillRect(0, 0, W, H); }
+  }
+
+  function syncCount() {
+    while (boids.length < P.count) boids.push(new Boid(Math.random() * W, Math.random() * H, Math.random() * Math.PI * 2, boids.length));
+    if (boids.length > P.count) boids.length = P.count;
+  }
+
+  // ---------- 交互 → 转向力 ----------
+  function interact(b) {
+    if (!mouse.inside || !mouse.down || !mouse.target) return;
+    var dx = wrapDelta(b.x - mouse.x, W), dy = wrapDelta(b.y - mouse.y, H);
+    var l2 = dx * dx + dy * dy, l = Math.sqrt(l2);
+    if (l < 1 || l > 340) return;
+    var pull = (1 - l / 340) * 2.2;
+    var ux = dx / l, uy = dy / l;
+    if (mouse.target === 'repel') { b.ax += ux * pull * P.speed * 7; b.ay += uy * pull * P.speed * 7; }
+    else { b.ax -= ux * pull * P.speed * 4; b.ay -= uy * pull * P.speed * 4; }
+  }
+
+  // 视野扇形是否覆盖某个方向 (dx,dy)。
+  // ⚠ 这个判定必须与 steer() 里的物理判定完全一致，否则画出来的视野范围是骗人的。
+  //
+  // 只做一条无分支的 cos 比较：
+  //   cosθ ≥ c   ⟺   (v·d) ≥ c·|v|·|d| ，θ 取 [0,180] 主值（|atan2| 保证）
+  // 不要加 "c≥0 且 dot<0 就 return false" 这类提前返回 —— 那会在 fov 恰好 180°
+  // 附近造出一道不连续缝，使 178° 与 182° 的行为不一致。
+  // 也不要用"两边平方去开方"的写法：漏掉 |v|² 因子会让判定随速度大小漂移。
+  //
+  // c<0（fov>180°）时视野是补集：背后剩一个窄盲区（见 P.fovBlindRad）。
+  function fovTest(b, dx, dy, d2) {
+    if (!FOV_LIMITED) return true;                 // fov=360°：无角度限制
+    if (d2 === 0) return false;
+    var dot = b.vx * dx + b.vy * dy;
+    var sp = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+    if (sp === 0) return false;
+    return dot >= COS_LIMIT * sp * Math.sqrt(d2);
+  }
+
+  // ---------- 每个个体的转向 ----------
+  function steer(b, d2max, r, dt) {
+    var i, o;
+    var cohX = 0, cohY = 0, aliX = 0, aliY = 0, sepX = 0, sepY = 0, n = 0;
+
+    for (i = 0; i < r.length; i++) {
+      o = r[i];
+      if (o === b) continue;
+      var dx = wrapDelta(o.x - b.x, W), dy = wrapDelta(o.y - b.y, H);
+      var d2 = dx * dx + dy * dy;
+      if (d2 > d2max || d2 === 0) continue;
+      var d = Math.sqrt(d2);
+      if (!fovTest(b, dx, dy, d2)) continue;            // 视野锥：物理与绘制共用同一判定
+      n++;
+      cohX += dx; cohY += dy;
+      aliX += o.vx; aliY += o.vy;
+      var w = 1 / d;
+      sepX -= dx * w; sepY -= dy * w;
+    }
+
+    if (n > 0) {
+      var inv = 1 / n;
+      b.ax += (cohX * inv) * P.coh * 0.0016;
+      b.ay += (cohY * inv) * P.coh * 0.0016;
+
+      // 对齐：真正的"转向"力，必须垂直于自身速度、幅值正比于夹角正弦。
+      // 若直接把邻居平均速度当加速度叠加，它会退化成方向恒定、与自身错开多少无关的
+      // 全局场 —— 那就丢掉了"越不一致、纠正越猛"的负反馈，共识无法涌现。
+      var avx = aliX, avy = aliY, avs = Math.hypot(avx, avy);
+      var sp0 = Math.hypot(b.vx, b.vy);
+      if (avs > 1e-4 && sp0 > 1e-4) {
+        var ux = b.vx / sp0, uy = b.vy / sp0;
+        var tvx = avx / avs, tvy = avy / avs;
+        var sinA = ux * tvy - uy * tvx;                  // 叉积：正比于夹角正弦
+        b.ax += -uy * sinA * P.ali * 0.35;
+        b.ay += ux * sinA * P.ali * 0.35;
+      }
+
+      b.ax += sepX * P.sep * 0.020;
+      b.ay += sepY * P.sep * 0.020;
+    }
+
+    b.wander();
+    if (P.noise > 0) {
+      // dt 无关的角扩散：高强度时代表个体决策的随机性（Vicsek 里的 η）
+      var na = (Math.random() * 2 - 1) * Math.PI;
+      var sa = Math.sin(na * 0.5), ca2 = Math.cos(na * 0.5);
+      var nvx = b.vx * ca2 - b.vy * sa, nvy = b.vx * sa + b.vy * ca2;
+      var k = Math.min(0.6, P.noise * 0.10 * dt * 60);
+      b.vx += (nvx - b.vx) * k;
+      b.vy += (nvy - b.vy) * k;
+    }
+    b.state = n;
+  }
+
+  function step(dt) {
+    var i, b, r, k;
+    var d2max = P.radius * P.radius;
+
+    if (mouse.down && mouse.target) {
+      mouse.vx = wrapDelta(mouse.x - mouse.px, W);
+      mouse.vy = wrapDelta(mouse.y - mouse.py, H);
+    } else { mouse.vx *= 0.6; mouse.vy *= 0.6; }
+    mouse.px = mouse.x; mouse.py = mouse.y;
+
+    // 先按当前半径定下网格尺寸，再重建桶 —— 顺序不能反：
+    // 若先改 cols/rows 再扩容 buckets，中间会有一次索引越界（拖半径滑杆时必崩）。
+    if (!grid || grid.cell !== P.radius) {
+      grid = makeGrid(P.radius);
+    } else {
+      var gc = grid.cols * grid.rows;
+      for (var gi = 0; gi < gc; gi++) grid.buckets[gi] = null;
+      grid.buckets.length = gc;
+    }
+
+    for (i = 0; i < boids.length; i++) {
+      b = boids[i];
+      var c = cellIndex(grid, b);
+      var bucket = grid.buckets[c];
+      if (!bucket) { bucket = []; grid.buckets[c] = bucket; }
+      bucket.push(b);
+    }
+
+    for (i = 0; i < boids.length; i++) {
+      b = boids[i];
+      b.ax = 0; b.ay = 0;
+
+      var cx = (b.x / P.radius) | 0, cy = (b.y / P.radius) | 0;
+      if (cx < 0) cx = 0; else if (cx >= grid.cols) cx = grid.cols - 1;
+      if (cy < 0) cy = 0; else if (cy >= grid.rows) cy = grid.rows - 1;
+
+      var near = [];
+      for (var yy = cy - 1; yy <= cy + 1; yy++) {
+        for (var xx = cx - 1; xx <= cx + 1; xx++) {
+          var gx = xx, gy = yy;
+          if (gx < 0) gx += grid.cols; else if (gx >= grid.cols) gx -= grid.cols;
+          if (gy < 0) gy += grid.rows; else if (gy >= grid.rows) gy -= grid.rows;
+          r = grid.buckets[gy * grid.cols + gx];
+          if (r) for (k = 0; k < r.length; k++) near.push(r[k]);
+        }
+      }
+
+      steer(b, d2max, near, dt);
+      interact(b);
+    }
+
+    // 积分
+    for (i = 0; i < boids.length; i++) {
+      b = boids[i];
+      var am = Math.hypot(b.ax, b.ay);
+      if (am > 6) { b.ax *= 6 / am; b.ay *= 6 / am; }
+      b.vx += b.ax * dt; b.vy += b.ay * dt;
+
+      var sp = Math.hypot(b.vx, b.vy) || 1e-4;
+      var lo = P.speed * 0.4, hi = P.speed * 1.3;
+      if (sp > hi) { b.vx *= hi / sp; b.vy *= hi / sp; }
+      else if (sp < lo) { b.vx *= lo / sp; b.vy *= lo / sp; }
+
+      if (mouse.target === 'attract' && mouse.down) {
+        var dxm = wrapDelta(mouse.x - b.x, W), dym = wrapDelta(mouse.y - b.y, H);
+        var dm = Math.hypot(dxm, dym);
+        if (dm > 8 && dm < 300) {
+          var want = 1.9 * P.speed, f = Math.pow(0.90, dt * 60);
+          b.vx = b.vx * f + (mouse.vx * 60 * want) * (1 - f);
+          b.vy = b.vy * f + (mouse.vy * 60 * want) * (1 - f);
+          b.vx += dxm / dm * 0.25 * dt * 60; b.vy += dym / dm * 0.25 * dt * 60;
+        }
+      }
+
+      b.x += b.vx * dt * 60; b.y += b.vy * dt * 60;
+      wrap(b);
+    }
+  }
+
+  // ---------- 序参量 ----------
+  function phase() {
+    if (!boids.length) return 0;
+    var sx = 0, sy = 0;
+    for (var i = 0; i < boids.length; i++) {
+      var s = Math.hypot(boids[i].vx, boids[i].vy) || 1e-6;
+      sx += boids[i].vx / s; sy += boids[i].vy / s;
+    }
+    return Math.hypot(sx, sy) / boids.length;
+  }
+  function avgNeighbors() {
+    if (!boids.length) return 0;
+    var s = 0;
+    for (var i = 0; i < boids.length; i++) s += boids[i].state;
+    return s / boids.length;
+  }
+  function avgSpeed() {
+    if (!boids.length) return 0;
+    var s = 0;
+    for (var i = 0; i < boids.length; i++) s += Math.hypot(boids[i].vx, boids[i].vy);
+    return s / boids.length;
+  }
+  function phaseLabel(p) {
+    if (p < 0.35) return ['无序 · 气态', '#ff6b6b'];
+    if (p < 0.75) return ['过渡 · 临界', '#ffd166'];
+    return ['有序 · 群体极化', '#4ade80'];
+  }
+
+  // ---------- 绘制 ----------
+  function draw() {
+    if (!bctx) return;
+    if (P.trails) {
+      bctx.fillStyle = 'rgba(6,9,13,0.16)';
+      bctx.fillRect(0, 0, W, H);
+    } else {
+      bctx.fillStyle = '#06090d';
+      bctx.fillRect(0, 0, W, H);
+    }
+
+    if (P.grid) {
+      bctx.strokeStyle = 'rgba(60,110,150,0.17)';
+      bctx.lineWidth = 1;
+      bctx.beginPath();
+      for (var gx = 0; gx <= W; gx += P.radius) { bctx.moveTo(gx, 0); bctx.lineTo(gx, H); }
+      for (var gy = 0; gy <= H; gy += P.radius) { bctx.moveTo(0, gy); bctx.lineTo(W, gy); }
+      bctx.stroke();
+    }
+
+    var i, b, sz = Math.min(3.6, 2.0 + 1.6 * Math.sqrt(520 / Math.max(60, boids.length)));
+    var R = sz * 2.9, R2 = sz * 1.9;
+    for (i = 0; i < boids.length; i++) {
+      b = boids[i];
+      if (b.x < -30 || b.x > W + 30 || b.y < -30 || b.y > H + 30) continue;
+      var a = Math.atan2(b.vy, b.vx);
+      var ca = Math.cos(a) * R, sa = Math.sin(a) * R;
+      var px = Math.cos(a + 2.5) * R2, py = Math.sin(a + 2.5) * R2;
+      var qx = Math.cos(a - 2.5) * R2, qy = Math.sin(a - 2.5) * R2;
+      var col;
+      if (P.colspd) {
+        var s = Math.hypot(b.vx, b.vy);
+        var u = Math.max(0, Math.min(1, (s - P.speed * 0.55) / (P.speed * 0.95)));
+        col = 'hsl(' + Math.round(196 - 44 * u) + ' 92% ' + Math.round(52 + 16 * u) + '%)';
+      } else {
+        col = 'hsl(' + ((b.seed * 37) % 360) + ' 78% 62%)';
+      }
+      bctx.fillStyle = col;
+      bctx.beginPath();
+      bctx.moveTo(b.x + ca, b.y + sa);
+      bctx.lineTo(b.x + px, b.y + py);
+      bctx.lineTo(b.x + qx, b.y + qy);
+      bctx.closePath();
+      bctx.fill();
+    }
+
+    // 视野范围可视化（三者叠加，共用同一套几何与判定）：
+    //   1) 感知圆   —— 距离上限 radius
+    //   2) 视野扇形 —— 角度范围 fov，以自身朝向为轴。
+    //                  fov<360° 用实心扇形表示可见区；fov>180° 时可见区其实是补集，
+    //                  于是改画"背后的盲区楔形"，语义才不会反。
+    //   3) 连接线   —— 只连真正参与转向计算的邻居，与物理结果一一对应
+    // 跨边界的线不画：世界是环面的，屏幕上那条直线会误导人。
+    if (P.ringMode > 0 && boids.length) {
+      var stepR = P.ringMode === 2
+        ? 1
+        : Math.max(1, Math.round(boids.length / Math.max(1, P.ringCount)));
+
+      var pathSome = new Path2D(), pathNone = new Path2D(), links = new Path2D();
+      var nSome = 0, nNone = 0, drawn = 0, nLinks = 0;
+      var d2max = P.radius * P.radius;
+      var halfFov = P.halfFovRad !== undefined ? P.halfFovRad : Math.PI / 2;
+      var blind = P.fovBlindRad !== undefined ? P.fovBlindRad : 0;
+      var axisLen = P.radius * 0.55;
+
+      for (i = 0; i < boids.length; i += stepR) {
+        b = boids[i];
+        drawn++;
+        var hasN = b.state > 0;
+        var p = hasN ? pathSome : pathNone;
+        p.moveTo(b.x + P.radius, b.y);
+        p.arc(b.x, b.y, P.radius, 0, Math.PI * 2);
+        if (hasN) nSome++; else nNone++;
+
+        var ang = Math.atan2(b.vy, b.vx);
+        if (P.fov < 358) {
+          if (blind > 0) {
+            // 可见区 = 以朝向为轴张开 fov 的锥（含超过 180° 的部分），
+            // 因此盲区是它的补集：从 ang+halfFov 绕到 ang+2π−halfFov，张角 = 2π − fov。
+            // 注意 blind 是盲区"半角"，直接拿它当张角会把盲区画成两倍大：
+            // 例如 fov=200°（可见半角 100°）时盲区应是 160°，而不是 200°。
+            p.moveTo(b.x, b.y);
+            p.lineTo(b.x + Math.cos(ang + halfFov) * P.radius, b.y + Math.sin(ang + halfFov) * P.radius);
+            p.moveTo(b.x, b.y);
+            p.arc(b.x, b.y, P.radius, ang + halfFov, ang + 2 * Math.PI - halfFov);
+            p.closePath();
+          } else {
+            // 可见区是朝前的实心扇形
+            p.moveTo(b.x, b.y);
+            p.lineTo(b.x + Math.cos(ang - halfFov) * P.radius, b.y + Math.sin(ang - halfFov) * P.radius);
+            p.moveTo(b.x, b.y);
+            p.arc(b.x, b.y, P.radius, ang - halfFov, ang + halfFov);
+            p.closePath();
+          }
+        }
+        // 朝向轴
+        var sp = Math.hypot(b.vx, b.vy) || 1;
+        p.moveTo(b.x, b.y);
+        p.lineTo(b.x + (b.vx / sp) * axisLen, b.y + (b.vy / sp) * axisLen);
+      }
+
+      // 连接线只画抽样个体，且限制条数，避免"全部"模式下一片糊
+      var linkBudget = P.ringMode === 2 ? 0 : 260;
+      if (linkBudget > 0) {
+        var stepL = Math.max(1, Math.round(boids.length / (P.ringMode === 1 ? 26 : boids.length)));
+        for (i = 0; i < boids.length && nLinks < linkBudget; i += stepL) {
+          b = boids[i];
+          for (var j = 0; j < boids.length; j++) {
+            if (j === i) continue;
+            var o = boids[j];
+            var dx = wrapDelta(o.x - b.x, W), dy = wrapDelta(o.y - b.y, H);
+            var dd2 = dx * dx + dy * dy;
+            if (dd2 > d2max || dd2 === 0) continue;
+            if (!fovTest(b, dx, dy, dd2)) continue;
+            var ex = b.x + dx, ey = b.y + dy;
+            if (ex < -0.5 || ex > W + 0.5 || ey < -0.5 || ey > H + 0.5) continue;  // 跨边界
+            links.moveTo(b.x, b.y);
+            links.lineTo(ex, ey);
+            nLinks++;
+          }
+        }
+      }
+
+      if (nSome) {
+        bctx.strokeStyle = 'rgba(95,211,255,0.30)';
+        bctx.lineWidth = 1;
+        bctx.stroke(pathSome);
+      }
+      if (nNone) {
+        // 孤立个体：感知范围内一个邻居都没有 —— 它此刻完全接收不到信息
+        bctx.strokeStyle = 'rgba(255,107,107,0.9)';
+        bctx.lineWidth = 1.5;
+        bctx.stroke(pathNone);
+      }
+      if (nLinks) {
+        bctx.strokeStyle = 'rgba(120,255,214,0.42)';
+        bctx.lineWidth = 1;
+        bctx.stroke(links);
+      }
+      ringDrawn = drawn; ringIsolated = nNone; ringLinks = nLinks;
+    } else {
+      ringDrawn = 0; ringIsolated = 0; ringLinks = 0;
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.drawImage(bg, 0, 0, W, H);
+
+    if (mouse.inside && mouse.target) {
+      ctx.strokeStyle = mouse.target === 'attract' ? 'rgba(95,211,255,0.75)' : 'rgba(255,107,107,0.8)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 26, 0, Math.PI * 2);
+      ctx.moveTo(mouse.x - 34, mouse.y); ctx.lineTo(mouse.x - 14, mouse.y);
+      ctx.moveTo(mouse.x + 14, mouse.y); ctx.lineTo(mouse.x + 34, mouse.y);
+      ctx.moveTo(mouse.x, mouse.y - 34); ctx.lineTo(mouse.x, mouse.y - 14);
+      ctx.moveTo(mouse.x, mouse.y + 14); ctx.lineTo(mouse.x, mouse.y + 34);
+      ctx.stroke();
+    }
+  }
+
+  // ---------- UI 文本 ----------
+  var elFps = $('s-fps'), elNb = $('s-nb'), elSpd = $('s-spd');
+  var elRad = $('s-rad'), elRing = $('s-ring'), elFovS = $('s-fov');
+  var elBig = $('phi-big'), elNum = $('phi-num'), elWord = $('phi-word'), elFill = $('phi-fill');
+
+  function lerpColor(a, b, u) {
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * u) + ',' +
+                    Math.round(a[1] + (b[1] - a[1]) * u) + ',' +
+                    Math.round(a[2] + (b[2] - a[2]) * u) + ')';
+  }
+  function phaseColor(p) {
+    var red = [255, 107, 107], amb = [255, 209, 102], grn = [74, 222, 128];
+    if (p < 0.5) return lerpColor(red, amb, p / 0.5);
+    return lerpColor(amb, grn, (p - 0.5) / 0.5);
+  }
+
+  function updateHUD(ph) {
+    if (!elFps) return;
+    frames++;
+    if (t - fpsT > 0.4) { fps = frames / (t - fpsT); fpsT = t; frames = 0; }
+    elFps.textContent = fps.toFixed(1);
+    elNb.textContent = avgNeighbors().toFixed(1);
+    elSpd.textContent = avgSpeed().toFixed(2);
+    if (elRad) elRad.textContent = P.radius.toFixed(0) + ' px';
+    if (elFovS) elFovS.textContent = P.fov.toFixed(0) + '°' + (P.fov >= 358 ? ' (整圆)' : '');
+    if (elRing) {
+      if (P.ringMode === 0) elRing.textContent = '未画';
+      else {
+        elRing.textContent = ringDrawn + ' / ' + ringIsolated + ' / ' + ringLinks;
+        elRing.style.color = ringIsolated > 0 ? '#ff6b6b' : '#cfe6f5';
+      }
+    }
+
+    var c = phaseColor(ph), lb = phaseLabel(ph);
+    if (elNum) elNum.textContent = ph.toFixed(3);
+    if (elBig) elBig.style.color = c;
+    if (elWord) { elWord.textContent = '· ' + lb[0]; elWord.style.color = lb[1]; }
+    if (elFill) { elFill.style.width = (ph * 100).toFixed(1) + '%'; elFill.style.background = c; }
+  }
+
+  // ---------- 主循环 ----------
+  function raf(fn) {
+    if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(fn);
+    return setTimeout(fn, 16);
+  }
+
+  function frame(now) {
+    raf(frame);
+    if (!last) { last = now; fpsT = now; return; }
+    var dt = (now - last) / 1000;
+    last = now;
+    if (dt > 0.1) dt = 0.1;
+    if (dt <= 0) dt = 1 / 60;
+    if (fpsCap > 0) { if (now < fpsCap) return; fpsCap = now + 1000 / 34; }
+    t += dt;
+    if (sweepDir !== 0) {
+      P.noise = Math.max(0, Math.min(2.5, P.noise + sweepDir * dt * 0.30));
+      if (P.noise <= 0) sweepDir = 1;
+      if (P.noise >= 2.5) sweepDir = -1;
+      var ni = $('noise'); if (ni) ni.value = P.noise;
+      syncVal('noise');
+    }
+    if (!paused) { step(dt); syncCount(); }
+    draw();
+    var ph = phase();
+    phaseEMA = phaseEMA < 0 ? ph : phaseEMA * 0.94 + ph * 0.06;
+    updateHUD(phaseEMA);
+  }
+  var paused = false;
+
+  // ---------- 绑定滑杆 ----------
+  function syncVal(k) {
+    var el = $('v-' + k);
+    if (el) el.textContent = CFG[k].fmt(P[k]) + (k === 'fov' ? '' : '');
+  }
+  function applyFov() {
+    var half = (P.fov * Math.PI / 180) / 2;
+    // 系数必须贴近 1：fovTest 用的就是它，而 draw() 画的是标称 fov 的扇形。
+    // 若这里留 0.98 之类的余量，物理判定就会比画出来的扇形窄几个百分点，
+    // 可视化立刻变成"说谎" —— 图上在视野内、实际却被排除。
+    var c = Math.cos(half) * 0.999;
+    FOV_LIMITED = P.fov < 359.5;       // 360° 直接关掉角度限制，不靠浮点比较判断
+    COS_LIMIT = c;
+    P.cosLimit = c;                    // 供 draw() 里的扇形几何使用
+    P.halfFovRad = half;
+    // fov > 180° 时 c<0：实际是"除了背后这个窄角之外全看得见"
+    P.fovBlindRad = c < 0 ? Math.PI - half : 0;
+  }
+  function bindRange(k, onInput) {
+    var el = $(k);
+    if (!el) return;
+    el.min = CFG[k].min; el.max = CFG[k].max; el.step = CFG[k].step;
+    el.value = P[k];
+    syncVal(k);
+    el.addEventListener('input', function () {
+      var v = parseFloat(el.value);
+      if (!isNaN(v)) P[k] = v;
+      syncVal(k);
+      if (onInput) onInput();
+    });
+  }
+
+  // ---------- 启动 ----------
+  function applyPreset(obj, rescatter) {
+    Object.keys(obj).forEach(function (k) {
+      if (!hasOwn(P, k) || !hasOwn(CFG, k)) return;
+      P[k] = obj[k];
+      var el = $(k); if (el) el.value = P[k];
+      syncVal(k);
+    });
+    applyFov();
+    if (rescatter) { reset(); }
+  }
+
+  function boot() {
+    if (!hasDOM || !cv || !ctx) return;
+
+    resize();
+    bindRange('sep'); bindRange('ali'); bindRange('coh');
+    bindRange('radius', function () { grid = null; });
+    bindRange('fov', applyFov);
+    bindRange('speed');
+    bindRange('noise', function () { sweepDir = 0; });
+    bindRange('count');
+    applyFov();
+
+    var toggles = { 't-trails': 'trails', 't-speed': 'colspd', 't-grid': 'grid' };
+    Object.keys(toggles).forEach(function (id) {
+      var el = $(id);
+      if (!el) return;
+      el.checked = !!P[toggles[id]];
+      el.addEventListener('change', function () {
+        P[toggles[id]] = el.checked;
+        if (id === 't-trails' && el.checked && bctx) { bctx.fillStyle = '#06090d'; bctx.fillRect(0, 0, W, H); }
+      });
+    });
+
+    // 感知范围三档：0 不画 / 1 抽样 / 2 全部
+    var ringRadios = document.querySelectorAll ? document.querySelectorAll('input[name=ringmode]') : [];
+    function syncRingRadios() {
+      for (var ri = 0; ri < ringRadios.length; ri++) {
+        ringRadios[ri].checked = (Number(ringRadios[ri].value) === P.ringMode);
+      }
+    }
+    for (var rj = 0; rj < ringRadios.length; rj++) {
+      ringRadios[rj].addEventListener('change', function () {
+        if (this.checked) { P.ringMode = Number(this.value); ringDrawn = 0; ringIsolated = 0; }
+      });
+    }
+    syncRingRadios();
+
+    var bPause = $('btn-pause');
+    if (bPause) bPause.addEventListener('click', function () {
+      paused = !paused;
+      bPause.textContent = paused ? '继续 (空格)' : '暂停 (空格)';
+    });
+    var bReset = $('btn-reset');
+    if (bReset) bReset.addEventListener('click', function () { reset(); rewire(); });
+    var bVic = $('btn-vicsek');
+    if (bVic) bVic.addEventListener('click', function () {
+      // Vicsek 模式：只保留"对齐 + 噪声"这一条规则 —— 相变最纯粹的形式
+      sweepDir = -1;
+      applyPreset({ sep: 0.15, ali: 2.1, coh: 0, noise: 0.9 }, true);
+    });
+    var bCrit = $('btn-critical');
+    if (bCrit) bCrit.addEventListener('click', function () {
+      // 临界噪声附近：φ 会在两相之间持续涨落（临界慢化）
+      sweepDir = 0;
+      applyPreset({ sep: 1.20, ali: 1.40, coh: 0.85, radius: 90, noise: 1.45 }, true);
+    });
+    var bNoisy = $('btn-noisy');
+    if (bNoisy) bNoisy.addEventListener('click', function () {
+      sweepDir = 0;
+      applyPreset({ sep: 1.20, ali: 1.40, coh: 0.85, noise: 2.5 }, true);
+    });
+    var bSweep = $('btn-noise-sweep');
+    if (bSweep) bSweep.addEventListener('click', function () {
+      if (!grid) return;
+      if (sweepDir === 0) { sweepDir = -1; }
+      else { sweepDir = 0; applyPreset({ noise: 0.22 }, false); }
+    });
+
+    // 鼠标
+    cv.addEventListener('mousemove', function (e) {
+      var r = cv.getBoundingClientRect();
+      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.inside = true;
+      if (mouse.down) mouse.target = (e.buttons & 2) ? 'repel' : 'attract';
+    });
+    cv.addEventListener('mouseleave', function () { mouse.inside = false; mouse.target = null; });
+    cv.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      mouse.down = 1; mouse.target = e.button === 2 ? 'repel' : 'attract';
+      if (cv.setPointerCapture && e.pointerId !== undefined) { try { cv.setPointerCapture(e.pointerId); } catch (err) {} }
+    });
+    window.addEventListener('mouseup', function () { mouse.down = 0; mouse.target = null; });
+    cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    cv.addEventListener('dblclick', function () { reset(); rewire(); });
+    cv.addEventListener('touchstart', function (e) {
+      var r = cv.getBoundingClientRect(), tt = e.touches[0];
+      mouse.x = tt.clientX - r.left; mouse.y = tt.clientY - r.top;
+      mouse.inside = true; mouse.down = 1; mouse.target = 'attract';
+      e.preventDefault();
+    }, { passive: false });
+    cv.addEventListener('touchmove', function (e) {
+      var r = cv.getBoundingClientRect(), tt = e.touches[0];
+      mouse.x = tt.clientX - r.left; mouse.y = tt.clientY - r.top;
+      e.preventDefault();
+    }, { passive: false });
+    cv.addEventListener('touchend', function () { mouse.down = 0; mouse.target = null; });
+
+    // 键盘
+    window.addEventListener('keydown', function (e) {
+      if (e.code === 'Space') {
+        e.preventDefault(); paused = !paused;
+        if (bPause) bPause.textContent = paused ? '继续 (空格)' : '暂停 (空格)';
+      } else if (e.key === 'r' || e.key === 'R') { reset(); rewire(); }
+      else if (e.key === 'h' || e.key === 'H') { var pn = $('panel'); if (pn) pn.classList.toggle('hide'); }
+      else if (e.key === 'c' || e.key === 'C') {
+        // 循环感知圈档位：不画 -> 抽样 -> 全部
+        P.ringMode = (P.ringMode + 1) % 3;
+        syncRingRadios();
+        ringDrawn = 0; ringIsolated = 0;
+      }
+      else if (e.key === 't' || e.key === 'T') {
+        P.trails = !P.trails; var el = $('t-trails'); if (el) el.checked = P.trails;
+        if (bctx) { bctx.fillStyle = '#06090d'; bctx.fillRect(0, 0, W, H); }
+      }
+    });
+
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) last = 0; });
+
+    reset();
+    raf(frame);
+  }
+
+  // 重置后无需重连监听，占位函数保持接口一致
+  function rewire() {}
+
+  if (hasDOM) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  } else {
+    // 非浏览器环境（例如语法自检）：暴露最小接口
+    if (typeof module !== 'undefined' && module.exports) module.exports = { Boid: Boid, step: step, phase: phase, P: P };
+  }
+
+  // 测试钩子：只有在外部先设置 window.__BOIDS_TEST_HOOK__ 时才会触发，
+  // 浏览器里正常打开时这一段完全不执行、零副作用。
+  // 必须放在 IIFE 末尾 —— 此时 P / boids 等变量才真正完成初始化。
+  if (typeof window !== 'undefined' && typeof window.__BOIDS_TEST_HOOK__ === 'function') {
+    try {
+      window.__BOIDS_TEST_HOOK__({
+        Boid: Boid, step: step, phase: phase, reset: reset, draw: draw, resize: resize,
+        applyFov: applyFov, fovTest: fovTest, P: P, boot: boot,
+        steer: steer, makeGrid: makeGrid,
+        boids: function () { return boids; },
+        ringStats: function () { return { drawn: ringDrawn, isolated: ringIsolated, links: ringLinks }; }
+      });
+    } catch (e) { /* 测试钩子不允许影响页面本身 */ }
+  }
+})();
+</script>
+</body>
+</html>
