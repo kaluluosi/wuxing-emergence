@@ -151,6 +151,22 @@
     </div>
 
     <div class="group">
+      <div class="gname">黑洞 · 排废（屁眼） <span class="en">中心熵出口</span></div>
+      <div class="toggles" style="margin-top:2px">
+        <label class="tg"><input type="checkbox" id="t-hole">启用黑洞（吸走阴料）</label>
+      </div>
+      <div class="row"><div class="rt"><label for="holeG">吸力 <span class="en">朝中心漂移</span></label><span class="val" id="v-holeG"></span></div><input type="range" id="holeG"></div>
+      <div class="row"><div class="rt"><label for="holeThresh">泄压阈值 <span class="en">阴料超此值才吸</span></label><span class="val" id="v-holeThresh"></span></div><input type="range" id="holeThresh"></div>
+      <div class="gname" style="margin-top:9px">五行阴料 · 各自吸引速率</div>
+      <div class="row"><div class="rt"><label for="holeRate0">木 速率</label><span class="val" id="v-holeRate0"></span></div><input type="range" id="holeRate0"></div>
+      <div class="row"><div class="rt"><label for="holeRate1">火 速率</label><span class="val" id="v-holeRate1"></span></div><input type="range" id="holeRate1"></div>
+      <div class="row"><div class="rt"><label for="holeRate2">土 速率</label><span class="val" id="v-holeRate2"></span></div><input type="range" id="holeRate2"></div>
+      <div class="row"><div class="rt"><label for="holeRate3">金 速率</label><span class="val" id="v-holeRate3"></span></div><input type="range" id="holeRate3"></div>
+      <div class="row"><div class="rt"><label for="holeRate4">水 速率</label><span class="val" id="v-holeRate4"></span></div><input type="range" id="holeRate4"></div>
+      <div class="hint" style="margin-top:6px">中心黑洞缓慢吸走<b>阴料</b>（废物）—— 系统的<b>熵出口</b>。阴料总量超过<b>泄压阈值</b>才启动；五行阴料各按自己的速率被吸。</div>
+    </div>
+
+    <div class="group">
       <div class="gname">活性 · 气（每族独立）</div>
       <div class="row"><div class="rt"><label for="spd0" style="color:#3ddc84">木</label><span class="val" id="v-spd0"></span></div><input type="range" id="spd0"></div>
       <div class="row"><div class="rt"><label for="spd1" style="color:#ff5a4d">火</label><span class="val" id="v-spd1"></span></div><input type="range" id="spd1"></div>
@@ -275,6 +291,15 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
     feedYang: [0.3, 0.3, 0.3, 0.3, 0.3],   // 默认 = 收支相抵的"进补"档（0.1 饿 / 0.3 均衡 / 1.5 过亢）
     feedYin:  [0, 0, 0, 0, 0],
     feedR: 320,          // 投喂口半径（料在口周围散布，大 = 离散分布；小 = 挤成一团）
+    // —— 黑洞（"屁眼"）：中心的熵出口 ——
+    //    全屏缓慢吸引「阴料」（废物），吸到中心即被吞噬 → 真正离开系统。
+    //    至此系统有了完整的一进一出：投喂口在边上（进营养），黑洞在中间（排废物）。
+    holeOn: 1,           // 1 = 启用黑洞；0 = 关闭（废物只能靠投喂口回收）
+    holeThresh: 1000,    // 阴料总量阈值：超过才启动黑洞（泄压阀）。
+                         //   默认 1000（≈物质总量）= 平时不泄压 → 保持物质守恒；想玩泄压就调低
+    holeG: 0.6,          // 基础吸力（每步朝中心移动的像素）
+    holeRate: [1, 1, 1, 1, 1],  // 五行阴料各自的吸引速率倍率（不同行可不同速）
+    holeR: 14,           // 吞噬半径（阴料进入此半径 → 被吞，离开系统）
     metabolism: 0.015,   // 每 tick 能量消耗（阴）—— 越大死得越快
     E0: 50,              // 初始能量
     splitE: 100,         // 能量达到此值 → 分裂成两个 E/2 的细胞（阳）
@@ -1069,6 +1094,30 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       }
     }
 
+    // 0.5) 黑洞（"屁眼"）：中心的熵出口（泄压阀）
+    //   阴料总量超过 holeThresh 才启动；五行阴料各按 holeRate[i] 的速率被吸。
+    if (P.wuxing && P.holeOn) {
+      var hcx = W * 0.5, hcy = H * 0.5;
+      var hScale = dt * 60;                        // 归一化到"每步 = 1/60 秒"
+      var hr2 = P.holeR * P.holeR;
+      var yinN = 0;
+      for (var yq = 0; yq < materials.length; yq++) if (materials[yq].yin) yinN++;
+      if (yinN > P.holeThresh) {                   // 只有"废物超载"时才吸
+        for (var hm = materials.length - 1; hm >= 0; hm--) {
+          var hmk = materials[hm];
+          if (!hmk.yin) continue;                  // 只吸阴料（只排废物，不排营养）
+          var hrate = P.holeRate[hmk.p]; if (!(hrate > 0)) continue;
+          var hdx = hcx - hmk.x, hdy = hcy - hmk.y;
+          var hd2 = hdx * hdx + hdy * hdy;
+          if (hd2 < hr2) { materials.splice(hm, 1); WXstats.holeEat = (WXstats.holeEat || 0) + 1; continue; }  // 到中心 → 被吞
+          var hd = Math.sqrt(hd2) || 1;
+          var hs = P.holeG * hrate * hScale;       // 该行阴料专属的吸引速率
+          if (hs >= hd) { materials.splice(hm, 1); WXstats.holeEat = (WXstats.holeEat || 0) + 1; continue; }  // 这步会越过中心 → 直接吞
+          hmk.x += (hdx / hd) * hs; hmk.y += (hdy / hd) * hs;
+        }
+      }
+    }
+
     // 1) 代谢（阴）：能量被消耗，且随年龄加速 —— 阳（增殖）最终会被阴（凋亡）追上
     for (i = 0; i < boids.length; i++) {
       b = boids[i];
@@ -1361,6 +1410,9 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
       ['txt',   '外部输入是唯一能量源；断供 → 必然全死（耗散结构）'],
       ['txt',   '物质守恒：总量恒定，不增殖（吃一份才排一份）'],
       ['gap',   ''],
+      ['sec',   '黑洞 · 屁眼（熵出口）'],
+      ['txt',   '中心黑洞吸走废物（阴料）；阴料超阈值才泄压'],
+      ['gap',   ''],
       ['sec',   '五行 · 相生相克循环']
     ];
     var bodyH = 0; for (var li = 0; li < lines.length; li++) bodyH += (lines[li][0] === 'gap' ? 8 : lh);
@@ -1459,6 +1511,19 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
         if (md.p < 0) continue;
         bctx.drawImage(glowSprites[md.p][md.yin ? 1 : 0], md.x - spHalf, md.y - spHalf);
       }
+    }
+
+    // 黑洞（"屁眼"）：中心的熵出口 —— 全屏吸走阴料
+    if (P.wuxing && P.holeOn) {
+      var bhx = W * 0.5, bhy = H * 0.5;
+      var bhg = bctx.createRadialGradient(bhx, bhy, 2, bhx, bhy, 52);
+      bhg.addColorStop(0, 'rgba(34,10,56,0.95)');
+      bhg.addColorStop(0.4, 'rgba(72,30,112,0.28)');
+      bhg.addColorStop(1, 'rgba(72,30,112,0)');
+      bctx.fillStyle = bhg; bctx.beginPath(); bctx.arc(bhx, bhy, 52, 0, 6.2832); bctx.fill();
+      bctx.fillStyle = '#05040a'; bctx.beginPath(); bctx.arc(bhx, bhy, P.holeR, 0, 6.2832); bctx.fill();
+      bctx.strokeStyle = 'rgba(178,120,255,0.75)'; bctx.lineWidth = 1.5;
+      bctx.beginPath(); bctx.arc(bhx, bhy, P.holeR + 1.5, 0, 6.2832); bctx.stroke();
     }
 
     if (P.grid) {
@@ -1782,6 +1847,34 @@ window.__BOIDS_TEST_HOOK__ = function (api) { window.__boidsApi = api; };
         upd();
       }
       for (var fbi = 0; fbi < 5; fbi++) { bindFeedArr('feedYang', fbi); bindFeedArr('feedYin', fbi); }
+    })();
+    // 黑洞（"屁眼"）：熵出口滑条（holeG / holeThresh / holeRate[0..4]）
+    (function () {
+      var tg = $('t-hole');
+      if (tg) { tg.checked = !!P.holeOn;
+        tg.addEventListener('change', function () { P.holeOn = tg.checked ? 1 : 0; }); }
+      function bindHole(key, minv, maxv, step, dec) {
+        var el = $(key); if (!el) return;
+        var valEl = $('v-' + key);
+        el.min = minv; el.max = maxv; el.step = step; el.value = P[key];
+        function upd() { if (valEl) valEl.textContent = Number(P[key]).toFixed(dec); }
+        el.__sync = upd;
+        el.addEventListener('input', function () { P[key] = parseFloat(el.value); upd(); });
+        upd();
+      }
+      bindHole('holeG', 0, 10, 0.1, 1);
+      bindHole('holeThresh', 0, 1200, 10, 0);
+      for (var hr = 0; hr < 5; hr++) {
+        (function (idx) {
+          var el = $('holeRate' + idx); if (!el) return;
+          var valEl = $('v-holeRate' + idx);
+          el.min = 0; el.max = 5; el.step = 0.1; el.value = P.holeRate[idx];
+          function upd() { if (valEl) valEl.textContent = Number(P.holeRate[idx]).toFixed(1); }
+          el.__sync = upd;
+          el.addEventListener('input', function () { P.holeRate[idx] = parseFloat(el.value); upd(); });
+          upd();
+        })(hr);
+      }
     })();
     // 活性（气）：typeSpeed 是数组，手动绑定（每族一个滑块）
     for (var sIdx = 0; sIdx < 5; sIdx++) {
